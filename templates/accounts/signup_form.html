@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_instructor %}
+        Inscription Instructeur
+    {% else %}
+        Inscription Étudiant
+    {% endif %}
+    - E-Learning Platform
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h4 class="card-title mb-0 text-center">
+                        {% if is_instructor %}
+                            Inscription Instructeur
+                        {% else %}
+                            Inscription Étudiant
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom*</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.first_name.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom*</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.last_name.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">Nom d'utilisateur*</label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.username.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Lettre, chiffres et @/./+/-/_ uniquement.</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email*</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.email.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.password1.id_for_label }}" class="form-label">Mot de passe*</label>
+                                    {{ form.password1 }}
+                                    {% if form.password1.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.password1.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmation du mot de passe*</label>
+                                    {{ form.password2 }}
+                                    {% if form.password2.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.password2.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.bio.id_for_label }}" class="form-label">Biographie</label>
+                                    {{ form.bio }}
+                                    {% if form.bio.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.bio.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Une courte bio pour vous présenter (facultatif).</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Photo de profil</label>
+                                    {{ form.profile_picture }}
+                                    {% if form.profile_picture.errors %}
+                                        <div class="text-danger mt-1 small">
+                                            {{ form.profile_picture.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Champs supplémentaires pour les instructeurs -->
+                            {% if is_instructor %}
+                                <div class="col-12">
+                                    <hr class="my-3">
+                                    <h5>Informations instructeur</h5>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="{{ form.website.id_for_label }}" class="form-label">Site web</label>
+                                        {{ form.website }}
+                                        {% if form.website.errors %}
+                                            <div class="text-danger mt-1 small">
+                                                {{ form.website.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="{{ form.qualifications.id_for_label }}" class="form-label">Qualifications</label>
+                                        {{ form.qualifications }}
+                                        {% if form.qualifications.errors %}
+                                            <div class="text-danger mt-1 small">
+                                                {{ form.qualifications.errors }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">Indiquez vos diplômes, certifications ou expériences pertinentes.</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <p>Vous avez déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none">Connectez-vous</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter la classe form-control aux champs du formulaire
+        const formInputs = document.querySelectorAll('form input[type="text"], form input[type="password"], form input[type="email"], form textarea, form select');
+        formInputs.forEach(input => {
+            input.classList.add('form-control');
+        });
+        
+        // Ajouter la classe form-control-file aux champs de type fichier
+        const fileInputs = document.querySelectorAll('form input[type="file"]');
+        fileInputs.forEach(input => {
+            input.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}

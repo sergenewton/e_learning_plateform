@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}E-Learning Platform - Accueil{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Apprenez à votre rythme, où que vous soyez</h1>
+                <p class="lead mb-4">Découvrez des cours interactifs, des quiz, et obtenez des certificats reconnus pour booster votre carrière.</p>
+                <div class="d-flex">
+                    <a href="{% url 'course_list' %}" class="btn btn-light btn-lg px-4 me-3">
+                        <i class="fas fa-book me-2"></i>Explorer les cours
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>S'inscrire
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+                <img src="https://img.freepik.com/free-vector/e-learning-education-template-vector-technology-ad-banner_53876-126253.jpg" alt="E-Learning" class="img-fluid rounded shadow" style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Une plateforme complète d'e-learning</h2>
+            <p class="lead text-muted">Tout ce dont vous avez besoin pour apprendre efficacement</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center p-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-laptop-code text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Cours interactifs</h4>
+                    <p class="card-text text-muted">Vidéos, textes et fichiers PDF pour un apprentissage complet.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center p-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-question-circle text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Quiz interactifs</h4>
+                    <p class="card-text text-muted">Testez vos connaissances avec des quiz personnalisés.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center p-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-certificate text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Certificats</h4>
+                    <p class="card-text text-muted">Obtenez des certificats vérifiables à la fin de chaque cours.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 text-center p-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-chart-line text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Suivi de progression</h4>
+                    <p class="card-text text-muted">Suivez votre progression et restez motivé.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Courses Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Cours populaires</h2>
+            <a href="{% url 'course_list' %}" class="btn btn-primary">Voir tous les cours</a>
+        </div>
+        
+        <div class="row g-4">
+            {% for course in popular_courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card course-card">
+                    {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top course-img" alt="{{ course.title }}">
+                    {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center course-img">
+                        <i class="fas fa-book fa-3x"></i>
+                    </div>
+                    {% endif %}
+                    <div class="badge badge-level bg-primary">{{ course.get_level_display }}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text text-muted small">{{ course.overview|truncatechars:100 }}</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i> {{ course.students.count }} inscrits
+                        </small>
+                        <a href="{% url 'course_detail' course.slug %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun cours disponible pour le moment. Revenez bientôt !
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recent Courses Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Cours récents</h2>
+        </div>
+        
+        <div class="row g-4">
+            {% for course in recent_courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card course-card">
+                    {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top course-img" alt="{{ course.title }}">
+                    {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center course-img">
+                        <i class="fas fa-book fa-3x"></i>
+                    </div>
+                    {% endif %}
+                    <div class="badge badge-level bg-primary">{{ course.get_level_display }}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text text-muted small">{{ course.overview|truncatechars:100 }}</p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i> {{ course.created|date:"d/m/Y" }}
+                        </small>
+                        <a href="{% url 'course_detail' course.slug %}" class="btn btn-sm btn-outline-primary">Détails</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun cours disponible pour le moment. Revenez bientôt !
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Parcourir par catégorie</h2>
+            <p class="lead text-muted">Trouvez le cours parfait dans votre domaine d'intérêt</p>
+        </div>
+        
+        <div class="row justify-content-center g-4">
+            {% for category in categories %}
+            <div class="col-md-6 col-lg-3">
+                <a href="{% url 'course_list_by_category' category.slug %}" class="text-decoration-none">
+                    <div class="card h-100 text-center p-4 border-0">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-folder text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h4 class="card-title">{{ category.name }}</h4>
+                        <p class="card-text text-muted">
+                            {{ category.courses.count }} cours disponibles
+                        </p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucune catégorie disponible pour le moment.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Prêt à commencer votre parcours d'apprentissage?</h2>
+        <p class="lead mb-4">Rejoignez des milliers d'apprenants et améliorez vos compétences dès aujourd'hui.</p>
+        {% if user.is_authenticated %}
+        <a href="{% url 'course_list' %}" class="btn btn-light btn-lg px-4">
+            <i class="fas fa-search me-2"></i>Trouver un cours
+        </a>
+        {% else %}
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4">
+            <i class="fas fa-user-plus me-2"></i>S'inscrire gratuitement
+        </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="text-center mb-4">Rejoindre notre communauté d'apprentissage</h2>
+                    <p class="text-center mb-5">Inscrivez-vous sur notre plateforme et commencez votre parcours d'apprentissage ou partagez vos connaissances avec le monde entier.</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="d-inline-block p-3 bg-primary bg-opacity-10 rounded-circle mb-3">
+                                        <i class="fas fa-user-graduate fa-3x text-primary"></i>
+                                    </div>
+                                    <h3>Je suis un étudiant</h3>
+                                    <p class="text-muted mb-4">Je souhaite apprendre de nouvelles compétences et suivre des cours.</p>
+                                    <div class="d-grid">
+                                        <a href="{% url 'student_signup' %}" class="btn btn-outline-primary">S'inscrire en tant qu'étudiant</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="d-inline-block p-3 bg-success bg-opacity-10 rounded-circle mb-3">
+                                        <i class="fas fa-chalkboard-teacher fa-3x text-success"></i>
+                                    </div>
+                                    <h3>Je suis un instructeur</h3>
+                                    <p class="text-muted mb-4">Je souhaite créer des cours et partager mon expertise.</p>
+                                    <div class="d-grid">
+                                        <a href="{% url 'instructor_signup' %}" class="btn btn-outline-success">S'inscrire en tant qu'instructeur</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5 text-center">
+                        <p>Vous avez déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none">Connectez-vous</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

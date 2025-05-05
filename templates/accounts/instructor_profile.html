@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil Instructeur - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Colonne de Profil -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" style="width: 150px; height: 150px;">
+                            <span class="text-white display-4">{{ user.first_name|first }}{{ user.last_name|first }}</span>
+                        </div>
+                        {% endif %}
+                        <h3 class="mt-3">{{ user.first_name }} {{ user.last_name }}</h3>
+                        <span class="badge instructor-badge">Instructeur</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Nom d'utilisateur:</strong> {{ user.username }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    {% if user.bio %}
+                    <div class="mb-3">
+                        <strong>Bio:</strong>
+                        <p class="text-muted">{{ user.bio }}</p>
+                    </div>
+                    {% endif %}
+                    {% if user.website %}
+                    <div class="mb-3">
+                        <strong>Site web:</strong>
+                        <a href="{{ user.website }}" target="_blank" class="text-decoration-none">{{ user.website }}</a>
+                    </div>
+                    {% endif %}
+                    {% if user.qualifications %}
+                    <div class="mb-3">
+                        <strong>Qualifications:</strong>
+                        <p class="text-muted">{{ user.qualifications }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="fas fa-user-edit me-2"></i>Modifier le Profil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne des Cours et Statistiques -->
+        <div class="col-lg-8">
+            <!-- Statistiques -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Mes Cours</h5>
+                            <p class="display-6">{{ courses|length }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Étudiants</h5>
+                            <p class="display-6">
+                                {% with total_students=0 %}
+                                    {% for stats in courses %}
+                                        {% with total_students=total_students|add:stats.students %}{% endwith %}
+                                    {% endfor %}
+                                    {{ total_students }}
+                                {% endwith %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Taux de complétion</h5>
+                            <p class="display-6">
+                                {% with completed=0 total=0 %}
+                                    {% for stats in courses %}
+                                        {% with completed=completed|add:stats.completed total=total|add:stats.students %}{% endwith %}
+                                    {% endfor %}
+                                    {% if total > 0 %}
+                                        {{ completed|floatformat:0 }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                {% endwith %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gestion des Cours -->
+            <div class="card shadow">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Mes Cours</h5>
+                    <a href="{% url 'course_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>Créer un cours
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cours</th>
+                                        <th>Statut</th>
+                                        <th>Étudiants</th>
+                                        <th>Taux de complétion</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stats in courses %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'course_detail' stats.course.slug %}" class="text-decoration-none">
+                                                {{ stats.course.title }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if stats.course.status == 'draft' %}
+                                            <span class="badge bg-warning text-dark">Brouillon</span>
+                                            {% elif stats.course.status == 'published' %}
+                                            <span class="badge bg-success">Publié</span>
+                                            {% elif stats.course.status == 'archived' %}
+                                            <span class="badge bg-secondary">Archivé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ stats.students }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ stats.completion_rate }}%;" aria-valuenow="{{ stats.completion_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">{{ stats.completion_rate|floatformat:1 }}%</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'course_detail' stats.course.slug %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'course_update' stats.course.slug %}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'course_manage' stats.course.slug %}" class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-cog"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chalkboard text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="lead">Vous n'avez pas encore créé de cours.</p>
+                            <a href="{% url 'course_create' %}" class="btn btn-primary">Créer votre premier cours</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Modification du Profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Modifier mon profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">Prénom</label>
+                        {{ form.first_name }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Nom</label>
+                        {{ form.last_name }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                        {{ form.bio }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.website.id_for_label }}" class="form-label">Site web</label>
+                        {{ form.website }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.qualifications.id_for_label }}" class="form-label">Qualifications</label>
+                        {{ form.qualifications }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Photo de profil</label>
+                        {{ form.profile_picture }}
+                        {% if user.profile_picture %}
+                            <div class="form-text">Une image est déjà téléchargée. Télécharger une nouvelle image la remplacera.</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter la classe form-control aux champs du formulaire de profil
+        const formInputs = document.querySelectorAll('#editProfileModal input, #editProfileModal textarea');
+        formInputs.forEach(input => {
+            input.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}
