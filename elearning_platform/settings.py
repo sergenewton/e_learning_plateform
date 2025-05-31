@@ -142,3 +142,6 @@ LOGIN_URL = 'login'
 
 # Modèle utilisateur personnalisé
 AUTH_USER_MODEL = 'accounts.User'
+
+# URL de base pour les liens absolus (par exemple, dans les certificats)
+BASE_URL = 'http://127.0.0.1:8000'

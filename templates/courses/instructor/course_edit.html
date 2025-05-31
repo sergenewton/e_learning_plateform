@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier {{ course.title }} - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item active">Modifier {{ course.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-gradient-primary text-white d-flex align-items-center">
+                        <i class="fas fa-edit fa-2x me-3"></i>
+                        <h3 class="card-title mb-0">Modifier votre cours</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-4">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Titre du cours</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger">{{ form.title.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="{{ form.overview.id_for_label }}" class="form-label fw-bold">Description</label>
+                                    {{ form.overview }}
+                                    {% if form.overview.errors %}
+                                        <div class="text-danger">{{ form.overview.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label for="{{ form.thumbnail.id_for_label }}" class="form-label fw-bold">Image du cours</label>
+                                    {% if course.thumbnail %}
+                                        <div class="card mb-3">
+                                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="card-img-top">
+                                        </div>
+                                    {% endif %}
+                                    {{ form.thumbnail }}
+                                    {% if form.thumbnail.errors %}
+                                        <div class="text-danger">{{ form.thumbnail.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Format recommandé: 16:9, min. 800x450px</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Catégorie</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="text-danger">{{ form.category.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Informations du cours</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.level.id_for_label }}" class="form-label fw-bold">Niveau</label>
+                                    {{ form.level }}
+                                    {% if form.level.errors %}
+                                        <div class="text-danger">{{ form.level.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.duration.id_for_label }}" class="form-label fw-bold">Durée estimée (heures)</label>
+                                    {{ form.duration }}
+                                    {% if form.duration.errors %}
+                                        <div class="text-danger">{{ form.duration.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Prix (€)</label>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}
+                                        <div class="text-danger">{{ form.price.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.discount_price.id_for_label }}" class="form-label fw-bold">Prix promotionnel (€)</label>
+                                    {{ form.discount_price }}
+                                    {% if form.discount_price.errors %}
+                                        <div class="text-danger">{{ form.discount_price.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-list-check me-2"></i>Contenu et visibilité</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.requirements.id_for_label }}" class="form-label fw-bold">Prérequis</label>
+                                    {{ form.requirements }}
+                                    {% if form.requirements.errors %}
+                                        <div class="text-danger">{{ form.requirements.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.objectives.id_for_label }}" class="form-label fw-bold">Objectifs d'apprentissage</label>
+                                    {{ form.objectives }}
+                                    {% if form.objectives.errors %}
+                                        <div class="text-danger">{{ form.objectives.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">Statut du cours</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="text-danger">{{ form.status.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Les cours en <b>brouillon</b> ne sont pas visibles pour les étudiants. 
+                                        Les cours <b>publiés</b> apparaissent dans les listes de cours et sont accessibles aux étudiants.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-3">
+                    <a href="{% url 'instructor_courses' %}" class="btn btn-outline-secondary me-2">Annuler</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter des classes Bootstrap aux champs du formulaire
+        document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
+            if (!el.classList.contains('form-control') && !el.classList.contains('form-select') && !el.classList.contains('form-check-input')) {
+                if (el.tagName === 'SELECT') {
+                    el.classList.add('form-select');
+                } else if (el.type === 'checkbox') {
+                    el.classList.add('form-check-input');
+                } else {
+                    el.classList.add('form-control');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

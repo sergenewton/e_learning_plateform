@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import FileResponse
 from django.conf import settings
+from django.core.files.base import ContentFile
 
 import os
 import io
@@ -15,6 +16,7 @@ from reportlab.lib.units import cm
 from PIL import Image
 import qrcode
 from io import BytesIO
+from reportlab.lib.utils import ImageReader
 
 from .models import Certificate, CertificateTemplate
 from .forms import CertificateTemplateForm
@@ -220,7 +222,8 @@ def generate_certificate_pdf(certificate):
         border=4,
     )
     
-    verification_url = f"{settings.BASE_URL}/certificates/verify/{certificate.certificate_id}/"
+    # Utilisez une URL relative pour la vérification, qui sera transformée en URL absolue lors de l'affichage
+    verification_url = f"/certificates/verify/{certificate.certificate_id}/"
     qr.add_data(verification_url)
     qr.make(fit=True)
     

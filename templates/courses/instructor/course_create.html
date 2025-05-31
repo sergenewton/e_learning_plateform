@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un nouveau cours - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg rounded-lg border-0">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <h2 class="card-title mb-0 fw-bold text-center">Créer un nouveau cours</h2>
+                    <p class="text-center mb-0 mt-2 text-white-50">Remplissez les informations ci-dessous pour créer votre cours</p>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Informations de base</h4>
+                                <hr class="mb-4">
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="mb-4">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Titre du cours</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger mt-1">{{ form.title.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="{{ form.overview.id_for_label }}" class="form-label fw-bold">Description</label>
+                                    {{ form.overview }}
+                                    {% if form.overview.errors %}
+                                        <div class="text-danger mt-1">{{ form.overview.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Une description engageante et détaillée de votre cours</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label for="{{ form.thumbnail.id_for_label }}" class="form-label fw-bold">Image du cours</label>
+                                    <div class="text-center mb-3 p-3 bg-light rounded">
+                                        <i class="fas fa-image fa-4x text-secondary mb-3"></i>
+                                        <p class="mb-0 small">Format recommandé : 16:9, min. 800x450px</p>
+                                    </div>
+                                    {{ form.thumbnail }}
+                                    {% if form.thumbnail.errors %}
+                                        <div class="text-danger mt-1">{{ form.thumbnail.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="mb-3 text-primary"><i class="fas fa-graduation-cap me-2"></i>Détails du cours</h4>
+                                <hr class="mb-4">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Catégorie</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="text-danger mt-1">{{ form.category.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label for="{{ form.level.id_for_label }}" class="form-label fw-bold">Niveau</label>
+                                    {{ form.level }}
+                                    {% if form.level.errors %}
+                                        <div class="text-danger mt-1">{{ form.level.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label for="{{ form.duration.id_for_label }}" class="form-label fw-bold">Durée estimée (heures)</label>
+                                    {{ form.duration }}
+                                    {% if form.duration.errors %}
+                                        <div class="text-danger mt-1">{{ form.duration.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.requirements.id_for_label }}" class="form-label fw-bold">Prérequis</label>
+                                    {{ form.requirements }}
+                                    {% if form.requirements.errors %}
+                                        <div class="text-danger mt-1">{{ form.requirements.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Connaissances préalables nécessaires pour suivre ce cours</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.objectives.id_for_label }}" class="form-label fw-bold">Objectifs d'apprentissage</label>
+                                    {{ form.objectives }}
+                                    {% if form.objectives.errors %}
+                                        <div class="text-danger mt-1">{{ form.objectives.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Ce que les étudiants apprendront dans ce cours</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="mb-3 text-primary"><i class="fas fa-cog me-2"></i>Paramètres de publication</h4>
+                                <hr class="mb-4">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Prix</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        {{ form.price }}
+                                    </div>
+                                    {% if form.price.errors %}
+                                        <div class="text-danger mt-1">{{ form.price.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">Statut de publication</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="text-danger mt-1">{{ form.status.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Les cours en brouillon ne sont pas visibles pour les étudiants</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-rocket me-2"></i>Créer le cours
+                            </button>
+                            <a href="{% url 'instructor_courses' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card-header {
+        border-bottom: none;
+    }
+    
+    hr {
+        height: 2px;
+        background-color: #f0f0f0;
+        opacity: 1;
+    }
+    
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+    
+    .text-primary {
+        color: #3498db !important;
+    }
+</style>
+{% endblock %}

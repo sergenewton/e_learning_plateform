@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Apprentissage - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar de navigation -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ course.title }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Barre de progression globale -->
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Progression globale</span>
+                            <span>{{ progress_percentage|floatformat:0 }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }}%;" 
+                                 aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Liste des modules -->
+                    <div class="list-group list-group-flush">
+                        {% for module in modules %}
+                            <a href="{% url 'module_content' course.slug module.id %}" 
+                               class="list-group-item list-group-item-action {% if current_module and current_module.id == module.id %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas {% if module.id in completed_modules %}fa-check-circle text-success{% else %}fa-circle{% endif %} me-2"></i>
+                                        {{ module.order }}. {{ module.title }}
+                                    </div>
+                                    {% if module.id in completed_modules %}
+                                        <span class="badge bg-success rounded-pill">Complété</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Informations du cours -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="fas fa-clock me-2"></i>Durée estimée</span>
+                        <span>{{ course.duration }} heures</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span><i class="fas fa-signal me-2"></i>Niveau</span>
+                        <span>{{ course.get_level_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-user-graduate me-2"></i>Instructeur</span>
+                        <span>{{ course.instructor.first_name }} {{ course.instructor.last_name }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if enrollment.completed %}
+                <div class="card shadow-sm mb-4 border-success">
+                    <div class="card-body text-center">
+                        <i class="fas fa-award text-success mb-3" style="font-size: 3rem;"></i>
+                        <h5>Cours complété !</h5>
+                        <p class="mb-3">Félicitations pour avoir terminé ce cours.</p>
+                        {% if certificate %}
+                            <a href="{% url 'certificate_detail' certificate.certificate_id %}" class="btn btn-success">
+                                <i class="fas fa-certificate me-2"></i>Voir mon certificat
+                            </a>
+                        {% else %}
+                            <a href="{% url 'course_complete' course.slug %}" class="btn btn-success">
+                                <i class="fas fa-certificate me-2"></i>Obtenir mon certificat
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Contenu principal -->
+        <div class="col-lg-9">
+            {% if current_module %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ current_module.title }}</h4>
+                        <span class="badge bg-primary">Module {{ current_module.order }}/{{ modules.count }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if current_module.description %}
+                            <p class="lead mb-4">{{ current_module.description }}</p>
+                        {% endif %}
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Cliquez sur le module pour accéder à son contenu complet et suivre votre progression.
+                        </div>
+                        
+                        <div class="text-center my-4">
+                            <a href="{% url 'module_content' course.slug current_module.id %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-book-open me-2"></i>Étudier ce module
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aperçu du contenu du module -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Aperçu du contenu</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% with text_count=current_module.textcontent_set.count %}
+                                {% if text_count > 0 %}
+                                    <div class="list-group-item">
+                                        <i class="fas fa-file-alt text-primary me-2"></i>
+                                        {{ text_count }} section{{ text_count|pluralize:"s" }} de texte
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            {% with file_count=current_module.filecontent_set.count %}
+                                {% if file_count > 0 %}
+                                    <div class="list-group-item">
+                                        <i class="fas fa-file text-primary me-2"></i>
+                                        {{ file_count }} fichier{{ file_count|pluralize:"s" }} à télécharger
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            {% with image_count=current_module.imagecontent_set.count %}
+                                {% if image_count > 0 %}
+                                    <div class="list-group-item">
+                                        <i class="fas fa-image text-primary me-2"></i>
+                                        {{ image_count }} image{{ image_count|pluralize:"s" }}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            {% with video_count=current_module.videocontent_set.count %}
+                                {% if video_count > 0 %}
+                                    <div class="list-group-item">
+                                        <i class="fas fa-video text-primary me-2"></i>
+                                        {{ video_count }} vidéo{{ video_count|pluralize:"s" }}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-exclamation-circle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h3>Aucun module disponible</h3>
+                        <p class="text-muted">Ce cours ne contient pas encore de modules. Veuillez revenir plus tard.</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if completed_modules|length == modules.count and modules.count > 0 and not enrollment.completed %}
+                <div class="card shadow-sm mb-4 border-success">
+                    <div class="card-body text-center">
+                        <i class="fas fa-trophy text-success mb-3" style="font-size: 3rem;"></i>
+                        <h5>Félicitations !</h5>
+                        <p class="mb-3">Vous avez complété tous les modules du cours. Cliquez ci-dessous pour terminer le cours et recevoir votre certificat.</p>
+                        <a href="{% url 'course_complete' course.slug %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-certificate me-2"></i>Terminer le cours et obtenir mon certificat
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activer les tooltips Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ module.title }} - {{ course.title }} - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar de navigation -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ course.title }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Barre de progression globale -->
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Progression</span>
+                            <a href="{% url 'course_learn' course.slug %}" class="text-decoration-none">
+                                <i class="fas fa-home me-1"></i>Accueil du cours
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Liste des modules -->
+                    <div class="list-group list-group-flush">
+                        {% for mod in course.modules.all %}
+                            <a href="{% url 'module_content' course.slug mod.id %}" 
+                               class="list-group-item list-group-item-action {% if module.id == mod.id %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas {% if mod.id in completed_modules %}fa-check-circle text-success{% else %}fa-circle{% endif %} me-2"></i>
+                                        {{ mod.order }}. {{ mod.title }}
+                                    </div>
+                                    {% if mod.id in completed_modules %}
+                                        <span class="badge bg-success rounded-pill">Complété</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenu principal -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ module.title }}</h4>
+                    <span class="badge bg-primary">Module {{ module.order }}/{{ course.modules.count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if module.description %}
+                        <p class="lead mb-4">{{ module.description }}</p>
+                        <hr>
+                    {% endif %}
+                    
+                    <!-- Contenu du module -->
+                    <div class="module-content">
+                        {% if text_contents or file_contents or image_contents or video_contents %}
+                            <!-- Textes -->
+                            {% for content in text_contents %}
+                                <div class="content-item mb-5" id="text-{{ content.id }}">
+                                    <h5 class="mb-3">{{ content.title }}</h5>
+                                    <div class="bg-light p-4 rounded">
+                                        {{ content.content|linebreaks }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Fichiers -->
+                            {% for content in file_contents %}
+                                <div class="content-item mb-5" id="file-{{ content.id }}">
+                                    <h5 class="mb-3">{{ content.title }}</h5>
+                                    <div class="bg-light p-4 rounded">
+                                        {% if content.description %}
+                                            <p>{{ content.description }}</p>
+                                        {% endif %}
+                                        <a href="{{ content.file.url }}" class="btn btn-primary" download>
+                                            <i class="fas fa-download me-2"></i>Télécharger {{ content.file.name|slice:"20:" }}
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Images -->
+                            {% for content in image_contents %}
+                                <div class="content-item mb-5" id="image-{{ content.id }}">
+                                    <h5 class="mb-3">{{ content.title }}</h5>
+                                    <div class="bg-light p-4 rounded text-center">
+                                        <img src="{{ content.image.url }}" alt="{{ content.title }}" class="img-fluid mb-3" style="max-height: 500px;">
+                                        {% if content.description %}
+                                            <p class="text-muted">{{ content.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Vidéos -->
+                            {% for content in video_contents %}
+                                <div class="content-item mb-5" id="video-{{ content.id }}">
+                                    <h5 class="mb-3">{{ content.title }}</h5>
+                                    <div class="bg-light p-4 rounded">
+                                        <div class="ratio ratio-16x9 mb-3">
+                                            <iframe src="{{ content.url|safe }}" allowfullscreen></iframe>
+                                        </div>
+                                        {% if content.description %}
+                                            <p class="text-muted">{{ content.description }}</p>
+                                        {% endif %}
+                                        {% if content.duration %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-clock me-1"></i>{{ content.duration }} minutes
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Marquer comme complété -->
+                            <div class="text-center mt-5 mb-3">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    {% if progress.completed %}
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Vous avez déjà complété ce module !
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-info mb-3">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Marquez ce module comme complété une fois que vous avez terminé d'étudier tout le contenu.
+                                        </div>
+                                        <button type="submit" name="complete_module" class="btn btn-success btn-lg">
+                                            <i class="fas fa-check-circle me-2"></i>Marquer comme complété
+                                        </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            
+                            <!-- Navigation entre modules -->
+                            <div class="d-flex justify-content-between mt-4">
+                                {% with prev_module=module.get_previous_module next_module=module.get_next_module %}
+                                    <div>
+                                        {% if prev_module %}
+                                            <a href="{% url 'module_content' course.slug prev_module.id %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-arrow-left me-2"></i>Module précédent
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        {% if next_module %}
+                                            <a href="{% url 'module_content' course.slug next_module.id %}" class="btn btn-outline-primary">
+                                                Module suivant<i class="fas fa-arrow-right ms-2"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endwith %}
+                            </div>
+                            
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Ce module ne contient pas encore de contenu.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Marquer la position actuelle dans la page
+        function markProgress() {
+            // Stocker la position de défilement
+            localStorage.setItem('scrollPos_{{ module.id }}', window.scrollY);
+        }
+        
+        // Vérifier s'il y a une position sauvegardée
+        var savedPos = localStorage.getItem('scrollPos_{{ module.id }}');
+        if (savedPos) {
+            window.scrollTo(0, savedPos);
+        }
+        
+        // Enregistrer la position lors du défilement
+        window.addEventListener('scroll', function() {
+            markProgress();
+        });
+    });
+</script>
+{% endblock %}

@@ -102,24 +102,36 @@ def course_learn(request, slug):
     if not current_module and modules.exists():
         current_module = modules.first()
     
-    # Calculer la progression globale
-    completed_modules = Progress.objects.filter(
+    # Obtenir les IDs des modules complétés
+    completed_module_ids = Progress.objects.filter(
         student=request.user,
         course=course,
         completed=True
-    ).count()
+    ).values_list('module_id', flat=True)
+    
+    # Calculer la progression globale
+    completed_modules_count = len(completed_module_ids)
     
     total_modules = modules.count()
     progress_percentage = 0
     if total_modules > 0:
-        progress_percentage = (completed_modules / total_modules) * 100
+        progress_percentage = (completed_modules_count / total_modules) * 100
+    
+    # Récupérer le certificat s'il existe
+    certificate = None
+    try:
+        certificate = Certificate.objects.get(student=request.user, course=course)
+    except Certificate.DoesNotExist:
+        certificate = None
     
     return render(request, 'courses/course_learn.html', {
         'course': course,
         'modules': modules,
         'current_module': current_module,
         'progress_percentage': progress_percentage,
-        'enrollment': enrollment
+        'enrollment': enrollment,
+        'completed_modules': completed_module_ids,
+        'certificate': certificate
     })
 
 @login_required
@@ -145,6 +157,13 @@ def module_content(request, slug, module_id):
         module=module
     )
     
+    # Obtenir les IDs des modules complétés
+    completed_modules = Progress.objects.filter(
+        student=request.user,
+        course=course,
+        completed=True
+    ).values_list('module_id', flat=True)
+    
     # Marquer comme complété si l'utilisateur soumet le formulaire
     if request.method == 'POST':
         if 'complete_module' in request.POST:
@@ -167,7 +186,8 @@ def module_content(request, slug, module_id):
         'image_contents': image_contents,
         'video_contents': video_contents,
         'progress': progress,
-        'enrollment': enrollment
+        'enrollment': enrollment,
+        'completed_modules': completed_modules
     })
 
 @login_required
@@ -254,7 +274,10 @@ def course_edit(request, slug):
     if request.method == 'POST':
         form = CourseUpdateForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
-            course = form.save()
+            course = form.save(commit=False)
+            # Mise à jour explicite du statut
+            course.status = form.cleaned_data['status']
+            course.save()
             messages.success(request, f'Le cours "{course.title}" a été mis à jour avec succès.')
             return redirect('instructor_courses')
     else:
@@ -372,10 +395,10 @@ def content_create(request, module_id, content_type):
     else:
         form = form_class()
     
-    return render(request, 'courses/instructor/content_create.html', {
+    template_name = f'courses/instructor/content_create_{content_type}.html'
+    return render(request, template_name, {
         'form': form,
-        'module': module,
-        'content_type': content_type
+        'module': module
     })
 
 @login_required

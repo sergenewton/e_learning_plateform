@@ -5,7 +5,7 @@ urlpatterns = [
     # Page d'accueil et liste des cours
     path('', views.home, name='home'),
     path('courses/', views.course_list, name='course_list'),
-    path('courses/category/<slug:category_slug>/', views.course_list, name='course_list_by_category'),
+    path('category/<slug:category_slug>/', views.course_list, name='course_list_by_category'),
     
     # Détails du cours et inscription
     path('course/<slug:slug>/', views.course_detail, name='course_detail'),

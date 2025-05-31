@@ -27,6 +27,7 @@ class Course(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Brouillon'),
         ('published', 'Publié'),
+        ('archived', 'Archivé'),
     )
     LEVEL_CHOICES = (
         ('beginner', 'Débutant'),
@@ -47,6 +48,9 @@ class Course(models.Model):
     thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    requirements = models.TextField(blank=True, help_text="Connaissances préalables nécessaires pour ce cours")
+    objectives = models.TextField(blank=True, help_text="Objectifs d'apprentissage pour ce cours")
+    duration = models.PositiveIntegerField(default=0, help_text="Durée estimée du cours en heures")
     
     def __str__(self):
         return self.title
@@ -58,6 +62,20 @@ class Course(models.Model):
     
     def get_absolute_url(self):
         return reverse('course_detail', args=[self.slug])
+    
+    @property
+    def requirements_list(self):
+        """Retourne une liste des prérequis du cours"""
+        if self.requirements:
+            return [req.strip() for req in self.requirements.split('\n') if req.strip()]
+        return []
+    
+    @property
+    def objectives_list(self):
+        """Retourne une liste des objectifs d'apprentissage du cours"""
+        if self.objectives:
+            return [obj.strip() for obj in self.objectives.split('\n') if obj.strip()]
+        return []
     
     class Meta:
         ordering = ['-created']
@@ -71,6 +89,14 @@ class Module(models.Model):
     
     def __str__(self):
         return f"{self.order}. {self.title}"
+    
+    def get_next_module(self):
+        """Retourne le module suivant dans le cours"""
+        return Module.objects.filter(course=self.course, order__gt=self.order).order_by('order').first()
+    
+    def get_previous_module(self):
+        """Retourne le module précédent dans le cours"""
+        return Module.objects.filter(course=self.course, order__lt=self.order).order_by('-order').first()
     
     class Meta:
         ordering = ['order']

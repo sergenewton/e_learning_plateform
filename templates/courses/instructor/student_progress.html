@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Progression de l'étudiant - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'course_students' course.slug %}">Étudiants</a></li>
+            <li class="breadcrumb-item active">{{ student.first_name }} {{ student.last_name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Progression de l'étudiant</h1>
+            <div class="d-flex align-items-center">
+                {% if student.profile_picture %}
+                    <img src="{{ student.profile_picture.url }}" alt="{{ student.username }}" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px;">
+                        <span class="text-white" style="font-size: 1.5rem;">{{ student.first_name|first }}{{ student.last_name|first }}</span>
+                    </div>
+                {% endif %}
+                <div>
+                    <h4 class="mb-0">{{ student.first_name }} {{ student.last_name }}</h4>
+                    <p class="text-muted mb-0">{{ student.email }}</p>
+                    <p class="mb-0">
+                        <small>Inscrit le {{ enrollment.enrolled_at|date:"d M Y" }}</small>
+                        {% if enrollment.completed %}
+                            <span class="badge bg-success ms-2">Cours complété</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark ms-2">En cours</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <a href="{% url 'course_students' course.slug %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Retour aux étudiants
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Résumé de progression</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4 text-center">
+                        <div class="position-relative d-inline-block">
+                            <canvas id="progressChart" width="200" height="200"></canvas>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <h2 class="mb-0">{{ overall_progress }}%</h2>
+                                <p class="text-muted mb-0">complété</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Modules complétés</span>
+                            <strong>{{ completed_modules }} / {{ total_modules }}</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ modules_progress }}%;" aria-valuenow="{{ modules_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Temps passé</span>
+                            <strong>{{ time_spent }} heures</strong>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between">
+                            <span>Dernière activité</span>
+                            <strong>{{ last_activity|date:"d M Y" }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Progression par module</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for module in modules %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">{{ module.order }}. {{ module.title }}</h6>
+                                    {% if module.completed %}
+                                        <span class="badge bg-success">Complété</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">En cours</span>
+                                    {% endif %}
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ module.progress }}%;" aria-valuenow="{{ module.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small class="text-muted">{{ module.progress }}% complété</small>
+                                    <small class="text-muted">Dernière activité: {{ module.last_activity|date:"d M Y" }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Créer le graphique circulaire de progression
+        var ctx = document.getElementById('progressChart').getContext('2d');
+        var progressChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [{{ overall_progress }}, {{ 100|add:"-"|add:overall_progress }}],
+                    backgroundColor: [
+                        '#28a745',
+                        '#f0f0f0'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '75%',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

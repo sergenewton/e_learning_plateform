@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Tous les cours - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar for Categories -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Catégories</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'course_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not category %}active{% endif %}">
+                            Tous les cours
+                            <span class="badge bg-primary rounded-pill">{{ courses.count }}</span>
+                        </a>
+                        {% for cat in categories %}
+                            <a href="{% url 'course_list_by_category' cat.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if category.id == cat.id %}active{% endif %}">
+                                {{ cat.name }}
+                                <span class="badge bg-primary rounded-pill">{{ cat.courses.count }}</span>
+                            </a>
+                        {% empty %}
+                            <div class="list-group-item text-center text-muted">
+                                Aucune catégorie disponible
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label class="form-label">Niveau</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="beginner" id="levelBeginner">
+                                <label class="form-check-label" for="levelBeginner">
+                                    Débutant
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="intermediate" id="levelIntermediate">
+                                <label class="form-check-label" for="levelIntermediate">
+                                    Intermédiaire
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="advanced" id="levelAdvanced">
+                                <label class="form-check-label" for="levelAdvanced">
+                                    Avancé
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline-primary">Appliquer les filtres</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content - Course List -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    {% if category %}
+                        <h1 class="mb-0">{{ category.name }}</h1>
+                        <p class="lead text-muted">{{ courses.count }} cours disponibles</p>
+                    {% else %}
+                        <h1 class="mb-0">Tous les cours</h1>
+                        <p class="lead text-muted">{{ courses.count }} cours disponibles</p>
+                    {% endif %}
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Trier par
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item" href="?sort=recent">Les plus récents</a></li>
+                        <li><a class="dropdown-item" href="?sort=popular">Les plus populaires</a></li>
+                        <li><a class="dropdown-item" href="?sort=title">Alphabétique</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                {% for course in courses %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100 course-card shadow-sm">
+                            {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" class="card-img-top course-img" alt="{{ course.title }}">
+                            {% else %}
+                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center course-img">
+                                    <i class="fas fa-book fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="badge badge-level bg-primary position-absolute top-0 end-0 m-2">{{ course.get_level_display }}</div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ course.title }}</h5>
+                                <p class="card-text text-muted small">{{ course.description|truncatechars:100 }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="d-flex align-items-center">
+                                        {% if course.instructor.profile_picture %}
+                                            <img src="{{ course.instructor.profile_picture.url }}" alt="{{ course.instructor.username }}" class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                                                <span class="text-white" style="font-size: 0.7rem;">{{ course.instructor.first_name|first }}{{ course.instructor.last_name|first }}</span>
+                                            </div>
+                                        {% endif %}
+                                        <small>{{ course.instructor.first_name }} {{ course.instructor.last_name }}</small>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i> {{ course.students.count }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <a href="{% url 'course_detail' course.slug %}" class="btn btn-primary d-block">Voir le cours</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>Aucun cours disponible dans cette catégorie pour le moment.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if courses.has_other_pages %}
+                <nav aria-label="Course pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if courses.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ courses.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&laquo;</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% for i in courses.paginator.page_range %}
+                            {% if courses.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if courses.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ courses.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .course-img {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .badge-level {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .course-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Modules pour {{ course.title }} - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item active">{{ course.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ course.title }}</h1>
+            <p class="lead">Gestion des modules</p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <a href="{% url 'course_edit' course.slug %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-edit me-1"></i>Modifier le cours
+            </a>
+            <a href="{% url 'course_detail' course.slug %}" class="btn btn-outline-secondary" target="_blank">
+                <i class="fas fa-eye me-1"></i>Voir
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Modules du cours</h5>
+                    <span class="badge bg-primary">{{ modules.count }} modules</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if modules %}
+                        <div class="list-group list-group-flush">
+                            {% for module in modules %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ module.order }}. {{ module.title }}</h5>
+                                        <p class="mb-0 text-muted">{{ module.description|truncatewords:10 }}</p>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a href="{% url 'module_content_list' module.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-list me-1"></i>Contenu
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center p-4">
+                            <i class="fas fa-book text-muted mb-3" style="font-size: 3rem;"></i>
+                            <p class="lead">Aucun module n'a encore été créé pour ce cours.</p>
+                            <p class="text-muted">Ajoutez des modules pour structurer votre cours.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Ajouter un module</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Titre du module</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Ajouter le module
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Conseils</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            Organisez votre cours en modules logiques
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            Ajoutez divers types de contenu pour chaque module
+                        </li>
+                        <li>
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            L'ordre des modules peut être modifié à tout moment
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter des classes Bootstrap aux champs du formulaire
+        document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
+            el.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}
