@@ -7,8 +7,8 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'course_modules' course.slug %}">{{ course.title }}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'course_students' course.slug %}">Étudiants</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_students' course.slug %}">Étudiants</a></li>
             <li class="breadcrumb-item active">{{ student.first_name }} {{ student.last_name }}</li>
         </ol>
     </nav>
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="col-md-4 d-flex justify-content-end align-items-center">
-            <a href="{% url 'course_students' course.slug %}" class="btn btn-outline-primary">
+            <a href="{% url 'courses:course_students' course.slug %}" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i>Retour aux étudiants
             </a>
         </div>

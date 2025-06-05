@@ -125,11 +125,11 @@
                         <a class="nav-link" href="{% url 'home' %}">Accueil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'course_list' %}">Cours</a>
+                        <a class="nav-link" href="{% url 'courses:course_list' %}">Cours</a>
                     </li>
                     {% if user.is_authenticated and user.is_instructor %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'instructor_courses' %}">Mes Cours</a>
+                        <a class="nav-link" href="{% url 'courses:instructor_courses' %}">Mes Cours</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -148,10 +148,10 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             {% if user.is_student %}
                             <li><a class="dropdown-item" href="{% url 'student_profile' %}">Mon Profil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'student_certificates' %}">Mes Certificats</a></li>
+                            <li><a class="dropdown-item" href="{% url 'certificates:student_certificates' %}">Mes Certificats</a></li>
                             {% elif user.is_instructor %}
                             <li><a class="dropdown-item" href="{% url 'instructor_profile' %}">Mon Profil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'instructor_courses' %}">Gérer Mes Cours</a></li>
+                            <li><a class="dropdown-item" href="{% url 'courses:instructor_courses' %}">Gérer Mes Cours</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
@@ -205,7 +205,7 @@
                     <h5 class="mb-3">Liens</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="{% url 'home' %}" class="text-white text-decoration-none">Accueil</a></li>
-                        <li class="mb-2"><a href="{% url 'course_list' %}" class="text-white text-decoration-none">Cours</a></li>
+                        <li class="mb-2"><a href="{% url 'courses:course_list' %}" class="text-white text-decoration-none">Cours</a></li>
                         <li><a href="#" class="text-white text-decoration-none">À propos</a></li>
                     </ul>
                 </div>

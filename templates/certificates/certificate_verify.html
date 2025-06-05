@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Vérification de Certificat - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-certificate me-2"></i>Vérification de Certificat</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if valid and certificate %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Certificat Authentique</strong> - Ce certificat est valide et a été délivré par notre plateforme.
+                        </div>
+                        
+                        <div class="text-center my-4">
+                            <h5>Détails du Certificat</h5>
+                            <hr>
+                            <p><strong>Étudiant:</strong> {{ certificate.student.get_full_name }}</p>
+                            <p><strong>Cours:</strong> {{ certificate.course.title }}</p>
+                            <p><strong>Date d'émission:</strong> {{ certificate.issued_date|date:"d F Y" }}</p>
+                            <p><strong>Identifiant:</strong> {{ certificate.certificate_id }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            <strong>Certificat Non Valide</strong> - Ce certificat n'est pas reconnu ou a été révoqué.
+                        </div>
+                        
+                        <div class="text-center my-4">
+                            <p>Le certificat avec l'identifiant <strong>{{ certificate_id }}</strong> n'a pas pu être vérifié comme authentique.</p>
+                            <p>Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe de support.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p>Vous pouvez vérifier d'autres certificats en utilisant leur identifiant unique.</p>
+                <form class="row g-3 justify-content-center" action="{% url 'certificates:certificate_verify_form' %}" method="get">
+                    <div class="col-auto">
+                        <input type="text" class="form-control" name="certificate_id" placeholder="Identifiant du certificat">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Vérifier</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

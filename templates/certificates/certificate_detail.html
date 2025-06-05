@@ -6,7 +6,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'student_certificates' %}">Mes Certificats</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'certificates:student_certificates' %}">Mes Certificats</a></li>
             <li class="breadcrumb-item active">Certificat - {{ certificate.course.title }}</li>
         </ol>
     </nav>
@@ -32,7 +32,7 @@
                             </div>
                             
                             <div class="d-flex justify-content-center gap-2 mt-3">
-                                <a href="{% url 'certificate_download' certificate.certificate_id %}" class="btn btn-primary">
+                                <a href="{% url 'certificates:certificate_download' certificate.certificate_id %}" class="btn btn-primary">
                                     <i class="fas fa-download me-2"></i>Télécharger en PDF
                                 </a>
                                 <a href="{{ verification_url }}" class="btn btn-outline-success" target="_blank">
@@ -62,7 +62,7 @@
             </div>
             
             <div class="d-flex justify-content-center">
-                <a href="{% url 'student_certificates' %}" class="btn btn-outline-secondary">
+                <a href="{% url 'certificates:student_certificates' %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Retour à mes certificats
                 </a>
             </div>

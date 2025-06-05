@@ -17,10 +17,10 @@
             <p class="lead">Gestion des modules</p>
         </div>
         <div class="col-md-4 d-flex justify-content-end align-items-center">
-            <a href="{% url 'course_edit' course.slug %}" class="btn btn-outline-primary me-2">
+            <a href="{% url 'courses:course_edit' course.slug %}" class="btn btn-outline-primary me-2">
                 <i class="fas fa-edit me-1"></i>Modifier le cours
             </a>
-            <a href="{% url 'course_detail' course.slug %}" class="btn btn-outline-secondary" target="_blank">
+            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary" target="_blank">
                 <i class="fas fa-eye me-1"></i>Voir
             </a>
         </div>

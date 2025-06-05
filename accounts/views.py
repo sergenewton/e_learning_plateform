@@ -97,10 +97,17 @@ def instructor_profile(request):
     
     # Compter le nombre d'étudiants et calculer le taux d'achèvement
     course_stats = []
+    total_students = 0
+    total_completed = 0
+    
     for course in courses:
         enrollments = course.enrollments.count()
         completed = course.enrollments.filter(completed=True).count()
         completion_rate = (completed / enrollments * 100) if enrollments > 0 else 0
+        
+        # Mise à jour des totaux
+        total_students += enrollments
+        total_completed += completed
         
         course_stats.append({
             'course': course,
@@ -108,6 +115,9 @@ def instructor_profile(request):
             'completed': completed,
             'completion_rate': completion_rate
         })
+    
+    # Calculer le taux de complétion global
+    overall_completion_rate = (total_completed / total_students * 100) if total_students > 0 else 0
     
     # Récupérer ou créer le profil d'instructeur
     instructor_profile, created = InstructorProfile.objects.get_or_create(user=request.user)
@@ -130,7 +140,10 @@ def instructor_profile(request):
     return render(request, 'accounts/instructor_profile.html', {
         'form': user_form,
         'extra_form': extra_form,
-        'courses': course_stats
+        'courses': course_stats,
+        'total_students': total_students,
+        'total_completed': total_completed,
+        'overall_completion_rate': overall_completion_rate
     })
 
 def profile_detail(request, username):

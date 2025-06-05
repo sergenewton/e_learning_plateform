@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier le quiz | {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'quiz_questions' quiz.id %}">Quiz: {{ quiz.title }}</a></li>
+            <li class="breadcrumb-item active">Modifier</li>
+        </ol>
+    </nav>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Modifier le quiz</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">{{ form.description.errors }}</div>
+                    {% endif %}
+                    <div class="form-text">{{ form.description.help_text }}</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.time_limit.id_for_label }}" class="form-label">{{ form.time_limit.label }}</label>
+                            {{ form.time_limit }}
+                            {% if form.time_limit.errors %}
+                                <div class="invalid-feedback d-block">{{ form.time_limit.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">{{ form.time_limit.help_text }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.required_score_to_pass.id_for_label }}" class="form-label">{{ form.required_score_to_pass.label }}</label>
+                            {{ form.required_score_to_pass }}
+                            {% if form.required_score_to_pass.errors %}
+                                <div class="invalid-feedback d-block">{{ form.required_score_to_pass.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">{{ form.required_score_to_pass.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'quiz_questions' quiz.id %}" class="btn btn-outline-secondary me-md-2">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styles pour les formulaires */
+    form input[type="text"],
+    form input[type="number"],
+    form textarea,
+    form select {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    form textarea {
+        min-height: 100px;
+    }
+    
+    form .invalid-feedback {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    
+    form .form-text {
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}

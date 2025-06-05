@@ -22,3 +22,8 @@ def get_attr(obj, attr_name):
 def in_list(value, arg):
     """Vérifie si une valeur est dans une liste."""
     return value in arg
+
+@register.filter
+def get_item(dictionary, key):
+    """Get the value from a dictionary using its key."""
+    return dictionary.get(key, None)

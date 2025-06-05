@@ -164,6 +164,22 @@ def module_content(request, slug, module_id):
         completed=True
     ).values_list('module_id', flat=True)
     
+    # Récupérer les quiz associés au module
+    from quizzes.models import Quiz, QuizAttempt
+    quizzes = Quiz.objects.filter(module=module)
+    
+    # Récupérer les informations sur les tentatives de quiz de l'étudiant
+    student_quiz_attempts = {}
+    for quiz in quizzes:
+        attempts = QuizAttempt.objects.filter(student=request.user, quiz=quiz).order_by('-start_time')
+        passed = attempts.filter(passed=True).exists()
+        last_attempt_id = attempts.first().id if attempts.exists() else None
+        student_quiz_attempts[quiz.id] = {
+            'attempts': attempts.exists(),
+            'passed': passed,
+            'last_attempt_id': last_attempt_id
+        }
+    
     # Marquer comme complété si l'utilisateur soumet le formulaire
     if request.method == 'POST':
         if 'complete_module' in request.POST:
@@ -187,7 +203,9 @@ def module_content(request, slug, module_id):
         'video_contents': video_contents,
         'progress': progress,
         'enrollment': enrollment,
-        'completed_modules': completed_modules
+        'completed_modules': completed_modules,
+        'quizzes': quizzes,
+        'student_quiz_attempts': student_quiz_attempts
     })
 
 @login_required
@@ -347,13 +365,18 @@ def module_content_list(request, module_id):
     image_contents = ImageContent.objects.filter(module=module).order_by('order')
     video_contents = VideoContent.objects.filter(module=module).order_by('order')
     
+    # Récupérer les quizzes du module
+    from quizzes.models import Quiz
+    quizzes = Quiz.objects.filter(module=module)
+    
     return render(request, 'courses/instructor/module_content_list.html', {
         'module': module,
         'course': course,
         'text_contents': text_contents,
         'file_contents': file_contents,
         'image_contents': image_contents,
-        'video_contents': video_contents
+        'video_contents': video_contents,
+        'quizzes': quizzes
     })
 
 @login_required

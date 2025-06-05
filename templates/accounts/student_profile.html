@@ -81,7 +81,7 @@
                 <div class="card shadow-sm">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Mes Cours</h5>
-                        <a href="{% url 'course_list' %}" class="btn btn-sm btn-outline-primary">Explorer plus de cours</a>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-outline-primary">Explorer plus de cours</a>
                     </div>
                     <div class="card-body">
                         {% if enrolled_courses %}
@@ -114,7 +114,7 @@
                                                     </div>
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <small>En cours</small>
-                                                        <a href="{% url 'course_detail' enrollment.course.slug %}" class="btn btn-sm btn-primary">Continuer</a>
+                                                        <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-primary">Continuer</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -146,7 +146,7 @@
                                                     <p class="card-text text-muted small">{{ enrollment.course.instructor.user.get_full_name }}</p>
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <span class="text-success">100% terminé</span>
-                                                        <a href="{% url 'course_detail' enrollment.course.slug %}" class="btn btn-sm btn-outline-primary">Revoir</a>
+                                                        <a href="{% url 'courses:course_detail' enrollment.course.slug %}" class="btn btn-sm btn-outline-primary">Revoir</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -162,7 +162,7 @@
                         {% else %}
                             <div class="text-center py-4">
                                 <p class="text-muted mb-3">Vous n'êtes inscrit à aucun cours actuellement.</p>
-                                <a href="{% url 'course_list' %}" class="btn btn-primary">Explorer les cours</a>
+                                <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Explorer les cours</a>
                             </div>
                         {% endif %}
                     </div>
@@ -188,8 +188,8 @@
                                             </div>
                                             <p class="card-text text-muted small">Obtenu le: {{ certificate.issue_date|date:"d M Y" }}</p>
                                             <div class="d-flex justify-content-end mt-3">
-                                                <a href="{% url 'certificate_detail' certificate.id %}" class="btn btn-sm btn-outline-success me-2">Voir</a>
-                                                <a href="{% url 'certificate_download' certificate.id %}" class="btn btn-sm btn-success">Télécharger</a>
+                                                <a href="{% url 'certificates:certificate_detail' certificate.certificate_id %}" class="btn btn-sm btn-outline-success me-2">Voir</a>
+                                                <a href="{% url 'certificates:certificate_download' certificate.certificate_id %}" class="btn btn-sm btn-success">Télécharger</a>
                                             </div>
                                         </div>
                                     </div>

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Résultats du Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content' course.slug module.id %}">Module: {{ module.title }}</a></li>
+            <li class="breadcrumb-item active">Résultats: {{ quiz.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="card shadow-sm mb-4">
+        <div class="card-header {% if attempt.passed %}bg-success{% else %}bg-danger{% endif %} text-white">
+            <h3 class="mb-0">Résultats: {{ quiz.title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4>Votre score: {{ attempt.score|floatformat:1 }}%</h4>
+                    <p>Score minimum requis: {{ quiz.required_score_to_pass }}%</p>
+                    
+                    {% if attempt.passed %}
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> Félicitations! Vous avez réussi ce quiz.</h5>
+                            <p>Vous pouvez maintenant continuer votre progression dans le cours.</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-times-circle"></i> Vous n'avez pas obtenu le score minimum requis.</h5>
+                            <p>Vous pouvez retenter le quiz pour améliorer votre score.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h5>Détails de la tentative</h5>
+                            <p><i class="far fa-clock"></i> Commencé: {{ attempt.start_time|date:"d/m/Y H:i" }}</p>
+                            <p><i class="far fa-clock"></i> Terminé: {{ attempt.end_time|date:"d/m/Y H:i" }}</p>
+                            <p><i class="far fa-clock"></i> Durée: {{ attempt.end_time|timeuntil:attempt.start_time }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Détail des réponses</h4>
+        </div>
+        <div class="card-body">
+            {% for response in responses %}
+                <div class="card mb-4">
+                    <div class="card-header {% if response.is_correct %}bg-success{% else %}bg-danger{% endif %} text-white">
+                        <h5 class="mb-0">Question {{ forloop.counter }}: {{ response.question.text }}</h5>
+                        {% if response.is_correct %}
+                            <span class="badge bg-light text-dark">Correct</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark">Incorrect</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if response.question.question_type == 'multiple_choice' or response.question.question_type == 'single_choice' %}
+                            <h6>Vos réponses:</h6>
+                            <ul>
+                                {% for answer in response.selected_answers.all %}
+                                    <li class="{% if answer.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                        {{ answer.text }}
+                                        {% if answer.is_correct %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        {% endif %}
+                                    </li>
+                                {% empty %}
+                                    <li class="text-muted">Aucune réponse sélectionnée</li>
+                                {% endfor %}
+                            </ul>
+                            
+                            <h6>Réponses correctes:</h6>
+                            <ul>
+                                {% for answer in response.question.answers.filter.all %}
+                                    {% if answer.is_correct %}
+                                        <li class="text-success">{{ answer.text }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            
+                        {% elif response.question.question_type == 'true_false' %}
+                            <h6>Votre réponse:</h6>
+                            {% with selected=response.selected_answers.first %}
+                                {% if selected %}
+                                    <p class="{% if selected.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                        {{ selected.text }}
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted">Aucune réponse sélectionnée</p>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <h6>Réponse correcte:</h6>
+                            {% with correct=response.question.answers.filter.first %}
+                                {% if correct.is_correct %}
+                                    <p class="text-success">{{ correct.text }}</p>
+                                {% endif %}
+                            {% endwith %}
+                            
+                        {% elif response.question.question_type == 'short_answer' %}
+                            <h6>Votre réponse:</h6>
+                            <p class="{% if response.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                {{ response.text_response|default:"Aucune réponse" }}
+                            </p>
+                            
+                            <h6>Réponses acceptées:</h6>
+                            <ul>
+                                {% for answer in response.question.answers.filter.all %}
+                                    {% if answer.is_correct %}
+                                        <li class="text-success">{{ answer.text }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'module_content' course.slug module.id %}" class="btn btn-primary me-md-2">
+                    Retourner au module
+                </a>
+                {% if not attempt.passed %}
+                    <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-outline-primary">
+                        Retenter le quiz
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

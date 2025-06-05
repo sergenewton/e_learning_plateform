@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'courses'
+
 urlpatterns = [
     # Page d'accueil et liste des cours
     path('', views.home, name='home'),

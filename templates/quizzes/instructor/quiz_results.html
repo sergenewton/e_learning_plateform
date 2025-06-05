@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Résultats du quiz | {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'quiz_questions' quiz.id %}">Quiz: {{ quiz.title }}</a></li>
+            <li class="breadcrumb-item active">Résultats</li>
+        </ol>
+    </nav>
+    
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Statistiques du quiz: {{ quiz.title }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Vue d'ensemble</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total des tentatives
+                                    <span class="badge bg-primary rounded-pill">{{ total_attempts }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Tentatives réussies
+                                    <span class="badge bg-success rounded-pill">{{ passed_attempts }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Taux de réussite
+                                    <span class="badge bg-info text-dark rounded-pill">{{ pass_rate|floatformat:1 }}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Score moyen
+                                    <span class="badge bg-info text-dark rounded-pill">{{ avg_score|floatformat:1 }}%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">Graphique de distribution des scores</h5>
+                            <div class="progress-stacked mt-3">
+                                <div class="progress" role="progressbar" style="width: {{ pass_rate }}%" aria-label="Réussite">
+                                    <div class="progress-bar bg-success">{{ pass_rate|floatformat:1 }}% de réussite</div>
+                                </div>
+                                <div class="progress" role="progressbar" style="width: {{ 100|sub:pass_rate }}%" aria-label="Échec">
+                                    <div class="progress-bar bg-danger">{{ 100|sub:pass_rate|floatformat:1 }}% d'échec</div>
+                                </div>
+                            </div>
+                            
+                            <div class="small text-muted mt-2">
+                                Score minimum requis: {{ quiz.required_score_to_pass }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Toutes les tentatives</h3>
+        </div>
+        <div class="card-body">
+            {% if attempts %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Date</th>
+                                <th>Durée</th>
+                                <th>Score</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in attempts %}
+                                <tr>
+                                    <td>{{ attempt.student.get_full_name|default:attempt.student.username }}</td>
+                                    <td>{{ attempt.start_time|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if attempt.end_time %}
+                                            {{ attempt.end_time|timeuntil:attempt.start_time }}
+                                        {% else %}
+                                            En cours
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attempt.score %}
+                                            {{ attempt.score|floatformat:1 }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attempt.passed %}
+                                            <span class="badge bg-success">Réussi</span>
+                                        {% elif attempt.score %}
+                                            <span class="badge bg-danger">Échoué</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Incomplet</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>Aucune tentative n'a encore été enregistrée pour ce quiz.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Vous pouvez ajouter des graphiques plus avancés avec Chart.js ou une autre librairie -->
+{% endblock %}

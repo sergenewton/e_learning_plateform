@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load course_extras %}
 
 {% block title %}{{ course.title }} - Apprentissage - E-Learning Platform{% endblock %}
 
@@ -67,11 +68,11 @@
                         <h5>Cours complété !</h5>
                         <p class="mb-3">Félicitations pour avoir terminé ce cours.</p>
                         {% if certificate %}
-                            <a href="{% url 'certificate_detail' certificate.certificate_id %}" class="btn btn-success">
+                            <a href="{% url 'certificates:certificate_detail' certificate.certificate_id %}" class="btn btn-success">
                                 <i class="fas fa-certificate me-2"></i>Voir mon certificat
                             </a>
                         {% else %}
-                            <a href="{% url 'course_complete' course.slug %}" class="btn btn-success">
+                            <a href="{% url 'courses:course_complete' course.slug %}" class="btn btn-success">
                                 <i class="fas fa-certificate me-2"></i>Obtenir mon certificat
                             </a>
                         {% endif %}
@@ -167,7 +168,7 @@
                         <i class="fas fa-trophy text-success mb-3" style="font-size: 3rem;"></i>
                         <h5>Félicitations !</h5>
                         <p class="mb-3">Vous avez complété tous les modules du cours. Cliquez ci-dessous pour terminer le cours et recevoir votre certificat.</p>
-                        <a href="{% url 'course_complete' course.slug %}" class="btn btn-success btn-lg">
+                        <a href="{% url 'courses:course_complete' course.slug %}" class="btn btn-success btn-lg">
                             <i class="fas fa-certificate me-2"></i>Terminer le cours et obtenir mon certificat
                         </a>
                     </div>

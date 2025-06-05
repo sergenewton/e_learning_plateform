@@ -7,7 +7,7 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
             <li class="breadcrumb-item active">Étudiants</li>
         </ol>
     </nav>
@@ -18,7 +18,7 @@
             <p class="lead">Étudiants inscrits</p>
         </div>
         <div class="col-md-4 d-flex justify-content-end align-items-center">
-            <a href="{% url 'course_modules' course.slug %}" class="btn btn-outline-primary">
+            <a href="{% url 'courses:course_modules' course.slug %}" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i>Retour aux modules
             </a>
         </div>

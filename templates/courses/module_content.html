@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load course_extras %}
 
 {% block title %}{{ module.title }} - {{ course.title }} - E-Learning Platform{% endblock %}
 
@@ -16,7 +17,7 @@
                     <div class="p-3 border-bottom">
                         <div class="d-flex justify-content-between mb-1">
                             <span>Progression</span>
-                            <a href="{% url 'course_learn' course.slug %}" class="text-decoration-none">
+                            <a href="{% url 'courses:course_learn' course.slug %}" class="text-decoration-none">
                                 <i class="fas fa-home me-1"></i>Accueil du cours
                             </a>
                         </div>
@@ -25,7 +26,7 @@
                     <!-- Liste des modules -->
                     <div class="list-group list-group-flush">
                         {% for mod in course.modules.all %}
-                            <a href="{% url 'module_content' course.slug mod.id %}" 
+                            <a href="{% url 'courses:module_content' course.slug mod.id %}" 
                                class="list-group-item list-group-item-action {% if module.id == mod.id %}active{% endif %}">
                                 <div class="d-flex w-100 justify-content-between align-items-center">
                                     <div>
@@ -117,6 +118,59 @@
                                 </div>
                             {% endfor %}
                             
+                            <!-- Quiz associés au module -->
+                            {% if quizzes %}
+                                <div class="quizzes-section mb-5">
+                                    <h4 class="mb-3"><i class="fas fa-question-circle me-2"></i>Quiz du module</h4>
+                                    
+                                    {% for quiz in quizzes %}
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">{{ quiz.title }}</h5>
+                                                {% with quiz_attempts=student_quiz_attempts|get_item:quiz.id %}
+                                                    {% if quiz_attempts.passed %}
+                                                        <span class="badge bg-success">Réussi</span>
+                                                    {% elif quiz_attempts.attempts %}
+                                                        <span class="badge bg-danger">Échoué</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Non tenté</span>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </div>
+                                            <div class="card-body">
+                                                <p>{{ quiz.description }}</p>
+                                                <div class="quiz-info d-flex justify-content-between small text-muted mb-3">
+                                                    <span><i class="fas fa-clock me-1"></i>Durée: {{ quiz.time_limit }} minutes</span>
+                                                    <span><i class="fas fa-percentage me-1"></i>Score minimum: {{ quiz.required_score_to_pass }}%</span>
+                                                    <span><i class="fas fa-question me-1"></i>Questions: {{ quiz.questions.count }}</span>
+                                                </div>
+                                                
+                                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                    {% with quiz_attempts=student_quiz_attempts|get_item:quiz.id %}
+                                                        {% if quiz_attempts.passed %}
+                                                            <a href="{% url 'quiz_result' quiz_attempts.last_attempt_id %}" class="btn btn-outline-primary">
+                                                                <i class="fas fa-eye me-1"></i>Voir résultats
+                                                            </a>
+                                                        {% elif quiz_attempts.attempts %}
+                                                            <a href="{% url 'quiz_result' quiz_attempts.last_attempt_id %}" class="btn btn-outline-primary me-2">
+                                                                <i class="fas fa-eye me-1"></i>Voir dernier résultat
+                                                            </a>
+                                                            <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary">
+                                                                <i class="fas fa-redo me-1"></i>Réessayer
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary">
+                                                                <i class="fas fa-play me-1"></i>Passer le quiz
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
                             <!-- Marquer comme complété -->
                             <div class="text-center mt-5 mb-3">
                                 <form method="post">
@@ -143,14 +197,14 @@
                                 {% with prev_module=module.get_previous_module next_module=module.get_next_module %}
                                     <div>
                                         {% if prev_module %}
-                                            <a href="{% url 'module_content' course.slug prev_module.id %}" class="btn btn-outline-primary">
+                                            <a href="{% url 'courses:module_content' course.slug prev_module.id %}" class="btn btn-outline-primary">
                                                 <i class="fas fa-arrow-left me-2"></i>Module précédent
                                             </a>
                                         {% endif %}
                                     </div>
                                     <div>
                                         {% if next_module %}
-                                            <a href="{% url 'module_content' course.slug next_module.id %}" class="btn btn-outline-primary">
+                                            <a href="{% url 'courses:module_content' course.slug next_module.id %}" class="btn btn-outline-primary">
                                                 Module suivant<i class="fas fa-arrow-right ms-2"></i>
                                             </a>
                                         {% endif %}

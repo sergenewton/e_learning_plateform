@@ -72,18 +72,27 @@ def certificate_download(request, certificate_id):
     )
     return response
 
-def certificate_verify(request, certificate_id):
+def certificate_verify(request, certificate_id=None):
     """Vérification publique de l'authenticité d'un certificat"""
-    try:
-        certificate = Certificate.objects.get(certificate_id=certificate_id)
-        valid = certificate.is_valid
-    except Certificate.DoesNotExist:
-        certificate = None
-        valid = False
+    # Si l'ID n'est pas dans l'URL, essayer de le récupérer des paramètres GET
+    if certificate_id is None:
+        certificate_id = request.GET.get('certificate_id')
+    
+    certificate = None
+    valid = False
+    
+    if certificate_id:
+        try:
+            certificate = Certificate.objects.get(certificate_id=certificate_id)
+            valid = certificate.is_valid
+        except Certificate.DoesNotExist:
+            certificate = None
+            valid = False
     
     return render(request, 'certificates/certificate_verify.html', {
         'certificate': certificate,
-        'valid': valid
+        'valid': valid,
+        'certificate_id': certificate_id
     })
 
 @login_required
@@ -222,8 +231,8 @@ def generate_certificate_pdf(certificate):
         border=4,
     )
     
-    # Utilisez une URL relative pour la vérification, qui sera transformée en URL absolue lors de l'affichage
-    verification_url = f"/certificates/verify/{certificate.certificate_id}/"
+    # Utilisez l'URL complète pour la vérification
+    verification_url = f"{settings.BASE_URL}/certificates/verify/{certificate.certificate_id}/"
     qr.add_data(verification_url)
     qr.make(fit=True)
     

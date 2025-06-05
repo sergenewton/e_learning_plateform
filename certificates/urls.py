@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'certificates'
+
 urlpatterns = [
     # URLs pour les étudiants
     path('my-certificates/', views.student_certificates, name='student_certificates'),
@@ -8,6 +10,7 @@ urlpatterns = [
     path('download/<uuid:certificate_id>/', views.certificate_download, name='certificate_download'),
     
     # URL publique pour la vérification de certificat
+    path('verify/', views.certificate_verify, name='certificate_verify_form'),
     path('verify/<uuid:certificate_id>/', views.certificate_verify, name='certificate_verify'),
     
     # URLs pour les administrateurs

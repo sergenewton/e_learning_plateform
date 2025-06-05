@@ -10,9 +10,9 @@
             <nav aria-label="breadcrumb" class="mb-3">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'course_list' %}">Cours</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Cours</a></li>
                     {% if course.category %}
-                    <li class="breadcrumb-item"><a href="{% url 'course_list_by_category' course.category.slug %}">{{ course.category.name }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list_by_category' course.category.slug %}">{{ course.category.name }}</a></li>
                     {% endif %}
                     <li class="breadcrumb-item active">{{ course.title }}</li>
                 </ol>
@@ -35,21 +35,21 @@
             </div>
             
             {% if enrolled %}
-                <a href="{% url 'course_learn' course.slug %}" class="btn btn-success btn-lg">
+                <a href="{% url 'courses:course_learn' course.slug %}" class="btn btn-success btn-lg">
                     <i class="fas fa-play-circle me-2"></i>Continuer l'apprentissage
                 </a>
             {% else %}
-                <a href="{% url 'course_enroll' course.slug %}" class="btn btn-primary btn-lg">
+                <a href="{% url 'courses:course_enroll' course.slug %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-graduation-cap me-2"></i>S'inscrire à ce cours
                 </a>
             {% endif %}
             
             {% if user == course.instructor %}
                 <div class="mt-3">
-                    <a href="{% url 'course_edit' course.slug %}" class="btn btn-outline-secondary me-2">
+                    <a href="{% url 'courses:course_edit' course.slug %}" class="btn btn-outline-secondary me-2">
                         <i class="fas fa-edit me-1"></i>Modifier
                     </a>
-                    <a href="{% url 'course_modules' course.slug %}" class="btn btn-outline-secondary">
+                    <a href="{% url 'courses:course_modules' course.slug %}" class="btn btn-outline-secondary">
                         <i class="fas fa-cog me-1"></i>Gérer les modules
                     </a>
                 </div>
@@ -238,7 +238,7 @@
                     {% if course.category %}
                     <div class="mb-3">
                         <h5>Catégorie</h5>
-                        <p><a href="{% url 'course_list_by_category' course.category.slug %}" class="text-decoration-none">{{ course.category.name }}</a></p>
+                        <p><a href="{% url 'courses:course_list_by_category' course.category.slug %}" class="text-decoration-none">{{ course.category.name }}</a></p>
                     </div>
                     {% endif %}
                     
