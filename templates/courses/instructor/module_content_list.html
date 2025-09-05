@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Contenu du module: {{ module.title }} - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item active">{{ module.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ module.title }}</h1>
+            <p class="lead">{{ module.description }}</p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="addContentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-plus me-2"></i>Ajouter du contenu
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="addContentDropdown">
+                    <li><a class="dropdown-item" href="{% url 'courses:content_create' module.id 'text' %}">
+                        <i class="fas fa-file-alt me-2"></i>Texte
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'courses:content_create' module.id 'file' %}">
+                        <i class="fas fa-file me-2"></i>Fichier
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'courses:content_create' module.id 'image' %}">
+                        <i class="fas fa-image me-2"></i>Image
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'courses:content_create' module.id 'video' %}">
+                        <i class="fas fa-video me-2"></i>Vidéo
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'create_quiz' module.id %}">
+                        <i class="fas fa-question-circle me-2"></i>Quiz
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Contenu du module</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if text_contents or file_contents or image_contents or video_contents %}
+                <div class="list-group list-group-flush">
+                    {% for content in text_contents %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ content.order }}</span>
+                                    <i class="fas fa-file-alt text-primary me-2"></i>
+                                    <strong>{{ content.title }}</strong>
+                                </div>
+                                <p class="mb-0 text-muted mt-2">{{ content.content|truncatewords:10 }}</p>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'courses:content_edit' content.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'courses:content_delete' content.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% for content in file_contents %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ content.order }}</span>
+                                    <i class="fas fa-file text-primary me-2"></i>
+                                    <strong>{{ content.title }}</strong>
+                                </div>
+                                <p class="mb-0 text-muted mt-2">
+                                    <a href="{{ content.file.url }}" target="_blank" class="text-decoration-none">
+                                        {{ content.file.name|slice:"20:" }}
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'courses:content_edit' content.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'courses:content_delete' content.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% for content in image_contents %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ content.order }}</span>
+                                    <i class="fas fa-image text-primary me-2"></i>
+                                    <strong>{{ content.title }}</strong>
+                                </div>
+                                <p class="mb-0 text-muted mt-2">
+                                    <img src="{{ content.image.url }}" alt="{{ content.title }}" style="max-height: 50px;" class="img-thumbnail">
+                                </p>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'courses:content_edit' content.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'courses:content_delete' content.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    {% for content in video_contents %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ content.order }}</span>
+                                    <i class="fas fa-video text-primary me-2"></i>
+                                    <strong>{{ content.title }}</strong>
+                                </div>
+                                <p class="mb-0 text-muted mt-2">{{ content.url }}</p>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'courses:content_edit' content.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'courses:content_delete' content.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-file-alt text-muted mb-3" style="font-size: 3rem;"></i>
+                    <p class="lead">Aucun contenu n'a encore été ajouté à ce module.</p>
+                    <p class="text-muted">Utilisez le bouton "Ajouter du contenu" pour commencer.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Section des quizzes -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Quiz du module</h5>
+            <a href="{% url 'create_quiz' module.id %}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus me-1"></i>Ajouter un quiz
+            </a>
+        </div>
+        <div class="card-body p-0">
+            {% if quizzes %}
+                <div class="list-group list-group-flush">
+                    {% for quiz in quizzes %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-question-circle text-primary me-2"></i>
+                                    <strong>{{ quiz.title }}</strong>
+                                </div>
+                                <p class="mb-0 text-muted mt-2">{{ quiz.description|truncatewords:10 }}</p>
+                                <div class="small text-muted mt-1">
+                                    <span class="me-3"><i class="fas fa-clock me-1"></i>{{ quiz.time_limit }} min</span>
+                                    <span><i class="fas fa-percentage me-1"></i>{{ quiz.required_score_to_pass }}% pour réussir</span>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'quiz_questions' quiz.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-list"></i> Questions
+                                </a>
+                                <a href="{% url 'quiz_results' quiz.id %}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-chart-bar"></i> Résultats
+                                </a>
+                                <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-question-circle text-muted mb-3" style="font-size: 3rem;"></i>
+                    <p class="lead">Aucun quiz n'a encore été ajouté à ce module.</p>
+                    <p class="text-muted">Utilisez le bouton "Ajouter un quiz" pour commencer.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Count
 
-from .models import User
-from .forms import StudentSignUpForm, InstructorSignUpForm, StudentProfileForm, InstructorProfileForm
+from .models import User, InstructorProfile
+from .forms import StudentSignUpForm, InstructorSignUpForm, StudentProfileForm, InstructorProfileForm, InstructorExtraProfileForm
 from courses.models import Course, Enrollment
 
 def register(request):
@@ -23,6 +23,7 @@ class StudentSignUpView(CreateView):
     
     def get_context_data(self, **kwargs):
         kwargs['user_type'] = 'étudiant'
+        kwargs['is_instructor'] = False
         return super().get_context_data(**kwargs)
     
     def form_valid(self, form):
@@ -40,6 +41,7 @@ class InstructorSignUpView(CreateView):
     
     def get_context_data(self, **kwargs):
         kwargs['user_type'] = 'instructeur'
+        kwargs['is_instructor'] = True
         return super().get_context_data(**kwargs)
     
     def form_valid(self, form):
@@ -56,7 +58,11 @@ def student_profile(request):
         return redirect('home')
     
     # Récupérer les cours auxquels l'étudiant est inscrit
-    enrollments = Enrollment.objects.filter(student=request.user).order_by('-created')
+    enrollments = Enrollment.objects.filter(student=request.user).order_by('-enrolled_at')
+    
+    # Séparer les inscriptions en cours et complétées
+    in_progress_courses = enrollments.filter(completed=False)
+    completed_courses = enrollments.filter(completed=True)
     
     # Récupérer les certificats de l'étudiant
     certificates = request.user.certificates.all()
@@ -74,6 +80,8 @@ def student_profile(request):
     return render(request, 'accounts/student_profile.html', {
         'form': form,
         'enrollments': enrollments,
+        'in_progress_courses': in_progress_courses,
+        'completed_courses': completed_courses,
         'certificates': certificates
     })
 
@@ -89,10 +97,17 @@ def instructor_profile(request):
     
     # Compter le nombre d'étudiants et calculer le taux d'achèvement
     course_stats = []
+    total_students = 0
+    total_completed = 0
+    
     for course in courses:
         enrollments = course.enrollments.count()
         completed = course.enrollments.filter(completed=True).count()
         completion_rate = (completed / enrollments * 100) if enrollments > 0 else 0
+        
+        # Mise à jour des totaux
+        total_students += enrollments
+        total_completed += completed
         
         course_stats.append({
             'course': course,
@@ -101,19 +116,34 @@ def instructor_profile(request):
             'completion_rate': completion_rate
         })
     
+    # Calculer le taux de complétion global
+    overall_completion_rate = (total_completed / total_students * 100) if total_students > 0 else 0
+    
+    # Récupérer ou créer le profil d'instructeur
+    instructor_profile, created = InstructorProfile.objects.get_or_create(user=request.user)
+    
     # Mettre à jour le profil de l'instructeur
     if request.method == 'POST':
-        form = InstructorProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
+        user_form = InstructorProfileForm(request.POST, request.FILES, instance=request.user)
+        extra_form = InstructorExtraProfileForm(request.POST, instance=instructor_profile)
+        
+        if user_form.is_valid() and extra_form.is_valid():
+            user_form.save()
+            extra_form.save()
             messages.success(request, "Votre profil a été mis à jour avec succès.")
             return redirect('instructor_profile')
     else:
-        form = InstructorProfileForm(instance=request.user)
+        user_form = InstructorProfileForm(instance=request.user)
+        extra_form = InstructorExtraProfileForm(instance=instructor_profile)
     
+    # Passer les deux formulaires à la template
     return render(request, 'accounts/instructor_profile.html', {
-        'form': form,
-        'courses': course_stats
+        'form': user_form,
+        'extra_form': extra_form,
+        'courses': course_stats,
+        'total_students': total_students,
+        'total_completed': total_completed,
+        'overall_completion_rate': overall_completion_rate
     })
 
 def profile_detail(request, username):
@@ -136,3 +166,10 @@ def profile_detail(request, username):
         })
     
     return render(request, 'accounts/profile_detail.html', context)
+
+
+def logout_view(request):
+    """Custom logout view that redirects to home"""
+    
+    logout(request)
+    return redirect('home')

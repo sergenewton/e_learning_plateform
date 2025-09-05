@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Questions du quiz | {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
+            <li class="breadcrumb-item active">Quiz: {{ quiz.title }}</li>
+        </ol>
+    </nav>
+    
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">{{ quiz.title }}</h3>
+            <div>
+                <a href="{% url 'edit_quiz' quiz.id %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-edit"></i> Modifier le quiz
+                </a>
+                <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash-alt"></i> Supprimer
+                </a>
+                <a href="{% url 'quiz_results' quiz.id %}" class="btn btn-info btn-sm text-white">
+                    <i class="fas fa-chart-bar"></i> Statistiques
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>{{ quiz.description }}</p>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Durée
+                            <span class="badge bg-primary rounded-pill">{{ quiz.time_limit }} minutes</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Score minimum
+                            <span class="badge bg-primary rounded-pill">{{ quiz.required_score_to_pass }}%</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Questions
+                            <span class="badge bg-primary rounded-pill">{{ questions.count }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Questions</h3>
+        <a href="{% url 'create_question' quiz.id %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Ajouter une question
+        </a>
+    </div>
+    
+    {% if questions %}
+        <div class="list-group">
+            {% for question in questions %}
+                <div class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ question.order }}. {{ question.text }}</h5>
+                        <div>
+                            <span class="badge bg-info text-white">{{ question.get_question_type_display }}</span>
+                            <span class="badge bg-secondary">{{ question.points }} point{{ question.points|pluralize }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <strong>Réponses:</strong>
+                        <ul class="list-unstyled">
+                            {% for answer in question.answers.all %}
+                                <li class="{% if answer.is_correct %}text-success{% endif %}">
+                                    {% if answer.is_correct %}<i class="fas fa-check-circle"></i>{% endif %}
+                                    {{ answer.text }}
+                                </li>
+                            {% empty %}
+                                <li class="text-muted">Aucune réponse ajoutée</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-2">
+                        <a href="{% url 'edit_question' question.id %}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'delete_question' question.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>Ce quiz ne contient pas encore de questions. Utilisez le bouton "Ajouter une question" pour commencer.</p>
+        </div>
+    {% endif %}
+    
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+        <a href="{% url 'module_content_list' module.id %}" class="btn btn-outline-secondary me-md-2">
+            Retour au module
+        </a>
+        {% if questions.exists %}
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Prévisualiser le quiz
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

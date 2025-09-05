@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes tentatives de quiz{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2>Mes tentatives de quiz</h2>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Historique des tentatives</h3>
+        </div>
+        <div class="card-body">
+            {% if attempts %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Cours</th>
+                                <th>Module</th>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in attempts %}
+                                <tr>
+                                    <td>{{ attempt.start_time|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ attempt.quiz.module.course.title }}</td>
+                                    <td>{{ attempt.quiz.module.title }}</td>
+                                    <td>{{ attempt.quiz.title }}</td>
+                                    <td>
+                                        {% if attempt.score %}
+                                            {{ attempt.score|floatformat:1 }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attempt.passed %}
+                                            <span class="badge bg-success">Réussi</span>
+                                        {% elif attempt.score %}
+                                            <span class="badge bg-danger">Échoué</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Incomplet</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if attempt.score %}
+                                            <a href="{% url 'quiz_result' attempt.id %}" class="btn btn-sm btn-primary">
+                                                Voir résultats
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {% if not attempt.passed %}
+                                            <a href="{% url 'take_quiz' attempt.quiz.id %}" class="btn btn-sm btn-outline-primary">
+                                                Réessayer
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p>Vous n'avez pas encore tenté de quiz.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer le quiz | {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'quiz_questions' quiz.id %}">Quiz: {{ quiz.title }}</a></li>
+            <li class="breadcrumb-item active">Supprimer</li>
+        </ol>
+    </nav>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Supprimer le quiz</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Attention!</h4>
+                <p>Vous êtes sur le point de supprimer le quiz <strong>{{ quiz.title }}</strong>.</p>
+                <hr>
+                <p class="mb-0">Cette action supprimera également toutes les questions, réponses et tentatives associées à ce quiz. Cette action est irréversible.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'quiz_questions' quiz.id %}" class="btn btn-outline-secondary me-md-2">Annuler</a>
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

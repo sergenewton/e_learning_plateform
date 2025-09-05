@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header du Cours -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}">Cours</a></li>
+                    {% if course.category %}
+                    <li class="breadcrumb-item"><a href="{% url 'courses:course_list_by_category' course.category.slug %}">{{ course.category.name }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active">{{ course.title }}</li>
+                </ol>
+            </nav>
+            
+            <h1 class="mb-3">{{ course.title }}</h1>
+            
+            <div class="mb-3 d-flex align-items-center flex-wrap">
+                <span class="badge bg-primary me-2">{{ course.get_level_display }}</span>
+                {% if course.category %}
+                <span class="badge bg-secondary me-2">{{ course.category.name }}</span>
+                {% endif %}
+                <span class="me-3"><i class="fas fa-clock me-1"></i> {{ course.duration }} heures</span>
+                <span class="me-3"><i class="fas fa-users me-1"></i> {{ course.students.count }} étudiants</span>
+                <span><i class="fas fa-calendar-alt me-1"></i> Mis à jour le {{ course.updated|date:"d M Y" }}</span>
+            </div>
+            
+            <div class="mb-4">
+                {{ course.overview|linebreaks }}
+            </div>
+            
+            {% if enrolled %}
+                <a href="{% url 'courses:course_learn' course.slug %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-play-circle me-2"></i>Continuer l'apprentissage
+                </a>
+            {% else %}
+                <a href="{% url 'courses:course_enroll' course.slug %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-graduation-cap me-2"></i>S'inscrire à ce cours
+                </a>
+            {% endif %}
+            
+            {% if user == course.instructor %}
+                <div class="mt-3">
+                    <a href="{% url 'courses:course_edit' course.slug %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'courses:course_modules' course.slug %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-1"></i>Gérer les modules
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}">
+                {% else %}
+                    <div class="bg-light text-center p-5">
+                        <i class="fas fa-book fa-4x text-secondary"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Instructeur</h5>
+                        <div class="d-flex align-items-center">
+                            {% if course.instructor.profile_picture %}
+                                <img src="{{ course.instructor.profile_picture.url }}" alt="{{ course.instructor.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                    <span class="text-white">{{ course.instructor.first_name|first }}{{ course.instructor.last_name|first }}</span>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ course.instructor.get_full_name }}</strong>
+                                <p class="text-muted mb-0 small">{{ course.instructor.instructor_profile.expertise|default:"Instructeur" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if course.price > 0 %}
+                        <div class="mb-3">
+                            <h5>Prix</h5>
+                            {% if course.discount_price %}
+                                <div>
+                                    <span class="text-decoration-line-through text-muted">{{ course.price }} €</span>
+                                    <span class="fs-4 fw-bold ms-2">{{ course.discount_price }} €</span>
+                                    {% with discount=course.price|add:"-"|add:course.discount_price|floatformat:0 %}
+                                        <span class="badge bg-danger ms-2">-{{ discount }} €</span>
+                                    {% endwith %}
+                                </div>
+                            {% else %}
+                                <span class="fs-4 fw-bold">{{ course.price }} €</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <h5>Prix</h5>
+                            <span class="badge bg-success">Gratuit</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <h5>Ce que vous allez apprendre</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for objective in course.objectives_list %}
+                                <li class="list-group-item bg-transparent px-0">
+                                    <i class="fas fa-check-circle text-success me-2"></i>{{ objective }}
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item bg-transparent px-0">
+                                    <i class="fas fa-info-circle text-muted me-2"></i>Aucun objectif spécifié.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h5>Prérequis</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for requirement in course.requirements_list %}
+                                <li class="list-group-item bg-transparent px-0">
+                                    <i class="fas fa-circle text-primary me-2" style="font-size: 0.5rem; vertical-align: middle;"></i>{{ requirement }}
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item bg-transparent px-0">
+                                    <i class="fas fa-info-circle text-muted me-2"></i>Aucun prérequis spécifié.
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenu du Cours -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Contenu du cours</h4>
+                </div>
+                <div class="card-body">
+                    {% if modules %}
+                        <div class="accordion" id="moduleAccordion">
+                            {% for module in modules %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ module.id }}">
+                                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ module.id }}">
+                                            <div class="d-flex justify-content-between w-100">
+                                                <span>{{ module.order }}. {{ module.title }}</span>
+                                                <span class="text-muted me-3 small d-none d-md-block">
+                                                    {% with text_count=module.textcontent_set.count file_count=module.filecontent_set.count image_count=module.imagecontent_set.count video_count=module.videocontent_set.count %}
+                                                        {% with total_count=text_count|add:file_count|add:image_count|add:video_count %}
+                                                            {{ total_count }} élément{{ total_count|pluralize }}
+                                                        {% endwith %}
+                                                    {% endwith %}
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ module.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ module.id }}" data-bs-parent="#moduleAccordion">
+                                        <div class="accordion-body">
+                                            <p>{{ module.description }}</p>
+                                            
+                                            <div class="list-group list-group-flush">
+                                                {% for content in module.textcontent_set.all %}
+                                                    <div class="list-group-item px-0 d-flex align-items-center">
+                                                        <i class="fas fa-file-alt text-primary me-3"></i>
+                                                        <div>{{ content.title }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                                
+                                                {% for content in module.filecontent_set.all %}
+                                                    <div class="list-group-item px-0 d-flex align-items-center">
+                                                        <i class="fas fa-file text-primary me-3"></i>
+                                                        <div>{{ content.title }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                                
+                                                {% for content in module.imagecontent_set.all %}
+                                                    <div class="list-group-item px-0 d-flex align-items-center">
+                                                        <i class="fas fa-image text-primary me-3"></i>
+                                                        <div>{{ content.title }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                                
+                                                {% for content in module.videocontent_set.all %}
+                                                    <div class="list-group-item px-0 d-flex align-items-center">
+                                                        <i class="fas fa-video text-primary me-3"></i>
+                                                        <div>{{ content.title }}</div>
+                                                        {% if content.duration %}
+                                                            <span class="ms-auto text-muted small">{{ content.duration }} min</span>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">Aucun module n'a encore été ajouté à ce cours.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Informations supplémentaires</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Date de création</h5>
+                        <p>{{ course.created|date:"d F Y" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Dernière mise à jour</h5>
+                        <p>{{ course.updated|date:"d F Y" }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h5>Niveau</h5>
+                        <p>{{ course.get_level_display }}</p>
+                    </div>
+                    
+                    {% if course.category %}
+                    <div class="mb-3">
+                        <h5>Catégorie</h5>
+                        <p><a href="{% url 'courses:course_list_by_category' course.category.slug %}" class="text-decoration-none">{{ course.category.name }}</a></p>
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <h5>Partager ce cours</h5>
+                        <div class="d-flex gap-2">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-primary">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ course.title }}" target="_blank" class="btn btn-outline-info">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ course.title }}" target="_blank" class="btn btn-outline-secondary">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="mailto:?subject={{ course.title }}&body={{ request.build_absolute_uri }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

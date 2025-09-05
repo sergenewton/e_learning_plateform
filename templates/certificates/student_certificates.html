@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Certificats - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="mb-3">Mes Certificats</h1>
+            <p class="text-muted">Vos certificats de réussite pour les cours que vous avez complétés.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if certificates %}
+                <div class="row g-4">
+                    {% for certificate in certificates %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card certificate-card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">{{ certificate.course.title }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-3">
+                                        <li class="mb-2"><i class="fas fa-user-graduate me-2"></i>Délivré à: <strong>{{ certificate.student.get_full_name }}</strong></li>
+                                        <li class="mb-2"><i class="fas fa-calendar-alt me-2"></i>Date: <strong>{{ certificate.issued_date|date:"d/m/Y" }}</strong></li>
+                                        <li><i class="fas fa-fingerprint me-2"></i>ID: <span class="text-muted">{{ certificate.certificate_id }}</span></li>
+                                    </ul>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'certificates:certificate_detail' certificate.certificate_id %}" class="btn btn-primary">
+                                            <i class="fas fa-eye me-2"></i>Voir le certificat
+                                        </a>
+                                        {% if certificate.file %}
+                                            <a href="{{ certificate.file.url }}" class="btn btn-outline-primary" download>
+                                                <i class="fas fa-download me-2"></i>Télécharger (PDF)
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Validé</span>
+                                    <small class="text-muted">{{ certificate.course.instructor.get_full_name }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <div class="text-center py-4">
+                        <i class="fas fa-certificate text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">Vous n'avez pas encore de certificats</h4>
+                        <p class="mb-4">Complétez un cours pour obtenir votre premier certificat.</p>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-primary">Explorer les cours</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Vérifier un certificat -->
+    <div class="row mt-5">
+        <div class="col-lg-6 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Vérifier un certificat</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Vous pouvez vérifier l'authenticité d'un certificat en entrant son ID unique.</p>
+                    <form action="{% url 'certificates:certificate_verify_form' %}" method="get" class="d-flex">
+                        <input type="text" name="certificate_id" class="form-control me-2" placeholder="Entrer l'ID du certificat">
+                        <button type="submit" class="btn btn-primary">Vérifier</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .certificate-card {
+        transition: transform 0.3s;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .certificate-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .certificate-card .card-header {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+</style>
+{% endblock %}

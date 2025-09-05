@@ -9,9 +9,18 @@ class CourseCreateForm(forms.ModelForm):
     
     class Meta:
         model = Course
-        fields = ['title', 'category', 'overview', 'level', 'thumbnail', 'price']
+        fields = ['title', 'category', 'overview', 'requirements', 'objectives', 'level', 'duration', 'thumbnail', 'price', 'status']
         widgets = {
-            'overview': forms.Textarea(attrs={'rows': 4}),
+            'overview': forms.Textarea(attrs={'rows': 4, 'class': 'form-control', 'placeholder': 'Description détaillée du cours...'}),
+            'requirements': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Connaissances préalables nécessaires...'}),
+            'objectives': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Ce que les étudiants vont apprendre...'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Titre du cours'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'level': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': 'Durée en heures'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}),
+            'thumbnail': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class CourseUpdateForm(forms.ModelForm):
@@ -19,9 +28,19 @@ class CourseUpdateForm(forms.ModelForm):
     
     class Meta:
         model = Course
-        fields = ['title', 'category', 'overview', 'level', 'thumbnail', 'price', 'discount_price', 'status']
+        fields = ['title', 'category', 'overview', 'requirements', 'objectives', 'level', 'duration', 'thumbnail', 'price', 'discount_price', 'status']
         widgets = {
-            'overview': forms.Textarea(attrs={'rows': 4}),
+            'overview': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'requirements': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'objectives': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'level': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'duration': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}),
+            'discount_price': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'step': '0.01'}),
+            'thumbnail': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class ModuleCreateForm(forms.ModelForm):
