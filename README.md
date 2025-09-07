@@ -95,6 +95,4 @@ gunicorn elearning_platform.wsgi:application
 
 3. Configurez un serveur web comme Nginx pour servir les fichiers statiques et média
 
-## Contributeurs
 
-- Akashosi
