@@ -6,7 +6,7 @@
 <div class="container my-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Tableau de bord</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
             <li class="breadcrumb-item active">Quiz: {{ quiz.title }}</li>
@@ -104,7 +104,7 @@
     {% endif %}
     
     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-        <a href="{% url 'module_content_list' module.id %}" class="btn btn-outline-secondary me-md-2">
+        <a href="{% url 'courses:module_content_list' module.id %}" class="btn btn-outline-secondary me-md-2">
             Retour au module
         </a>
         {% if questions.exists %}

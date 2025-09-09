@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load course_extras %}
 
 {% block title %}{{ module.title }} - {{ course.title }} - E-Learning Platform{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container py-4">
     <div class="row">
         <!-- Sidebar de navigation -->
         <div class="col-lg-3">
@@ -98,25 +99,30 @@
                                 </div>
                             {% endfor %}
                             
-                            <!-- Vidéos -->
-                            {% for content in video_contents %}
-                                <div class="content-item mb-5" id="video-{{ content.id }}">
-                                    <h5 class="mb-3">{{ content.title }}</h5>
-                                    <div class="bg-light p-4 rounded">
-                                        <div class="ratio ratio-16x9 mb-3">
-                                            <iframe src="{{ content.url|safe }}" allowfullscreen></iframe>
-                                        </div>
-                                        {% if content.description %}
-                                            <p class="text-muted">{{ content.description }}</p>
-                                        {% endif %}
-                                        {% if content.duration %}
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-clock me-1"></i>{{ content.duration }} minutes
-                                            </span>
-                                        {% endif %}
+                        <!-- Vidéos -->
+                        <!-- Vidéos -->
+                        {% for content in video_contents %}
+                            <div class="content-item mb-5" id="video-{{ content.id }}">
+                                <h5 class="mb-3">{{ content.title }}</h5>
+                                <div class="bg-light p-4 rounded">
+                                    <div class="ratio ratio-16x9 mb-3">
+                                        <iframe src="{{ content.url|youtube_embed_url }}" 
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                allowfullscreen>
+                                        </iframe>
                                     </div>
+                                    {% if content.description %}
+                                        <p class="text-muted">{{ content.description }}</p>
+                                    {% endif %}
+                                    {% if content.duration %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-clock me-1"></i>{{ content.duration }} minutes
+                                        </span>
+                                    {% endif %}
                                 </div>
-                            {% endfor %}
+                            </div>
+                        {% endfor %}
                             
                             <!-- Quiz associés au module -->
                             {% if quizzes %}

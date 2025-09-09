@@ -25,7 +25,7 @@ def take_quiz(request, quiz_id):
     # Vérifier si l'étudiant est inscrit au cours
     if not course.students.filter(id=request.user.id).exists():
         messages.error(request, "Vous devez être inscrit au cours pour passer ce quiz.")
-        return redirect('course_detail', slug=course.slug)
+        return redirect('courses:course_detail', slug=course.slug)
     
     # Vérifier si l'étudiant a déjà une tentative réussie
     passed_attempt = QuizAttempt.objects.filter(
@@ -34,7 +34,7 @@ def take_quiz(request, quiz_id):
     
     if passed_attempt:
         messages.info(request, "Vous avez déjà réussi ce quiz.")
-        return redirect('module_content', slug=course.slug, module_id=module.id)
+        return redirect('courses:module_content', slug=course.slug, module_id=module.id)
     
     # Créer une nouvelle tentative
     if request.method == 'POST':
@@ -251,7 +251,7 @@ def delete_quiz(request, quiz_id):
     if request.method == 'POST':
         quiz.delete()
         messages.success(request, f"Le quiz '{quiz.title}' a été supprimé avec succès.")
-        return redirect('module_content_list', module_id=module.id)
+        return redirect('courses:module_content_list', module_id=module.id)
     
     return render(request, 'quizzes/instructor/delete_quiz.html', {
         'quiz': quiz,

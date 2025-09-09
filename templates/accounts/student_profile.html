@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
+{% load math_extras %}
 
 {% block title %}Mon Profil - E-Learning Platform{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row">
+
         <!-- Sidebar -->
         <div class="col-lg-3">
             <div class="card shadow-sm mb-4">
@@ -63,6 +65,7 @@
                                 <p><strong>Cours suivis:</strong> {{ enrollments|length }}</p>
                                 <p><strong>Cours complétés:</strong> {{ completed_courses|length }}</p>
                                 <p><strong>Certificats obtenus:</strong> {{ certificates|length }}</p>
+
                             </div>
                         </div>
                         
@@ -96,11 +99,12 @@
                             <div class="tab-content" id="courseTabsContent">
                                 <div class="tab-pane fade show active" id="in-progress" role="tabpanel">
                                     <div class="row">
+                                        
                                         {% for enrollment in in_progress_courses %}
                                         <div class="col-md-6 mb-4">
                                             <div class="card h-100">
-                                                {% if enrollment.course.image %}
-                                                    <img src="{{ enrollment.course.image.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 160px; object-fit: cover;">
+                                                {% if enrollment.course.thumbnail %}
+                                                    <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 160px; object-fit: cover;">
                                                 {% else %}
                                                     <div class="bg-light card-img-top d-flex align-items-center justify-content-center" style="height: 160px;">
                                                         <span class="text-muted">Pas d'image</span>
@@ -131,8 +135,9 @@
                                         {% for enrollment in completed_courses %}
                                         <div class="col-md-6 mb-4">
                                             <div class="card h-100">
-                                                {% if enrollment.course.image %}
-                                                    <img src="{{ enrollment.course.image.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 160px; object-fit: cover;">
+                                                
+                                                {% if enrollment.course.thumbnail %}
+                                                    <img src="{{ enrollment.course.thumbnail.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 160px; object-fit: cover;">
                                                 {% else %}
                                                     <div class="bg-light card-img-top d-flex align-items-center justify-content-center" style="height: 160px;">
                                                         <span class="text-muted">Pas d'image</span>
@@ -244,10 +249,10 @@
                             <h6 class="mb-2">Progression globale</h6>
                             <div class="progress mb-4" style="height: 20px;">
                                 <div class="progress-bar" role="progressbar" 
-                                     style="width: {% widthratio completed_courses|length enrollments|length 100 %}%;" 
-                                     aria-valuenow="{% widthratio completed_courses|length enrollments|length 100 %}" 
-                                     aria-valuemin="0" aria-valuemax="100">
-                                    {% widthratio completed_courses|length enrollments|length 100 %}%
+                                    style="width: {{ completed_courses|length|percentage:enrollments|length }}%;" 
+                                    aria-valuenow="{{ completed_courses|length|percentage:enrollments|length }}" 
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {{ completed_courses|length|percentage:enrollments|length }}%
                                 </div>
                             </div>
                         {% endif %}

@@ -6,7 +6,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Mes Cours</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
             <li class="breadcrumb-item active">Étudiants</li>
         </ol>
@@ -75,7 +75,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'student_progress' course.slug enrollment.student.id %}" class="btn btn-sm btn-outline-primary">
+                                        <a href="{% url 'courses:student_progress' course.slug enrollment.student.id %}" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-chart-line me-1"></i>Détails
                                         </a>
                                     </td>

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer le contenu - E-Learning Platform{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">{{ module.title }}</a></li>
+            <li class="breadcrumb-item active">Supprimer le contenu</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmer la suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer ce contenu ?</p>
+                    <div class="alert alert-warning">
+                        <strong>{{ content.title }}</strong><br>
+                        <small>Cette action est irréversible.</small>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'courses:module_content_list' module.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
