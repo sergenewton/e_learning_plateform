@@ -89,14 +89,14 @@
                             <h5>Prix</h5>
                             {% if course.discount_price %}
                                 <div>
-                                    <span class="text-decoration-line-through text-muted">{{ course.price }} €</span>
-                                    <span class="fs-4 fw-bold ms-2">{{ course.discount_price }} €</span>
+                                    <span class="text-decoration-line-through text-muted">{{ course.price }} BIF</span>
+                                    <span class="fs-4 fw-bold ms-2">{{ course.discount_price }} BIF</span>
                                     {% with discount=course.price|add:"-"|add:course.discount_price|floatformat:0 %}
-                                        <span class="badge bg-danger ms-2">-{{ discount }} €</span>
+                                        <span class="badge bg-danger ms-2">-{{ discount }} BIF</span>
                                     {% endwith %}
                                 </div>
                             {% else %}
-                                <span class="fs-4 fw-bold">{{ course.price }} €</span>
+                                <span class="fs-4 fw-bold">{{ course.price }} BIF</span>
                             {% endif %}
                         </div>
                     {% else %}

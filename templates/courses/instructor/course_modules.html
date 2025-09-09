@@ -1,120 +1,223 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Modules pour {{ course.title }} - E-Learning Platform{% endblock %}
+{% block title %}Modules - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.module-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.module-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+.delete-confirmation {
+    display: none;
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 10px 15px;
+    border: 1px solid #f5c6cb;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.content-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.content-item {
+    text-align: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.content-icon {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
-            <li class="breadcrumb-item active">{{ course.title }}</li>
-        </ol>
-    </nav>
-    
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>{{ course.title }}</h1>
-            <p class="lead">Gestion des modules</p>
-        </div>
-        <div class="col-md-4 d-flex justify-content-end align-items-center">
-            <a href="{% url 'courses:course_edit' course.slug %}" class="btn btn-outline-primary me-2">
-                <i class="fas fa-edit me-1"></i>Modifier le cours
-            </a>
-            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary" target="_blank">
-                <i class="fas fa-eye me-1"></i>Voir
-            </a>
-        </div>
-    </div>
-    
+<div class="container mt-4">
     <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Modules du cours</h5>
-                    <span class="badge bg-primary">{{ modules.count }} modules</span>
-                </div>
-                <div class="card-body p-0">
-                    {% if modules %}
-                        <div class="list-group list-group-flush">
-                            {% for module in modules %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">{{ module.order }}. {{ module.title }}</h5>
-                                        <p class="mb-0 text-muted">{{ module.description|truncatewords:10 }}</p>
-                                    </div>
-                                    <div class="btn-group">
-                                        <a href="{% url 'module_content_list' module.id %}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-list me-1"></i>Contenu
-                                        </a>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center p-4">
-                            <i class="fas fa-book text-muted mb-3" style="font-size: 3rem;"></i>
-                            <p class="lead">Aucun module n'a encore été créé pour ce cours.</p>
-                            <p class="text-muted">Ajoutez des modules pour structurer votre cours.</p>
-                        </div>
-                    {% endif %}
-                </div>
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Modules du cours : {{ course.title }}</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+                    <i class="fas fa-plus"></i> Ajouter un module
+                </button>
             </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Ajouter un module</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.title.id_for_label }}" class="form-label">Titre du module</label>
-                            {{ form.title }}
-                            {% if form.title.errors %}
-                                <div class="text-danger">{{ form.title.errors }}</div>
-                            {% endif %}
+
+            {% if modules %}
+                {% for module in modules %}
+                <div class="module-card" id="module-{{ module.id }}">
+                    <div class="module-header">
+                        <div>
+                            <h4>{{ module.title }}</h4>
+                            <p class="text-muted mb-0">{{ module.description|truncatewords:20 }}</p>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="text-danger">{{ form.description.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Ajouter le module
+                        <div class="module-actions">
+                            <a href="{% url 'courses:module_content_list' module.id %}" class="btn btn-sm btn-success">
+                                <i class="fas fa-list"></i> Contenu
+                            </a>
+                            <button class="btn btn-sm btn-delete" onclick="confirmDelete({{ module.id }}, '{{ module.title|escapejs }}')">
+                                <i class="fas fa-trash"></i> Supprimer
                             </button>
                         </div>
-                    </form>
+                    </div>
+                    
+                    <div class="delete-confirmation" id="confirm-{{ module.id }}">
+                        <h6><i class="fas fa-exclamation-triangle"></i> Confirmation de suppression</h6>
+                        <p><strong>Attention !</strong> Vous êtes sur le point de supprimer le module "{{ module.title }}".</p>
+                        <p>Cette action supprimera définitivement :</p>
+                        <div class="content-summary">
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-file-text text-primary"></i></div>
+                                <div><strong>{{ module.text_contents.count }}</strong></div>
+                                <small>Texte{{ module.text_contents.count|pluralize }}</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-file-pdf text-danger"></i></div>
+                                <div><strong>{{ module.file_contents.count }}</strong></div>
+                                <small>Fichier{{ module.file_contents.count|pluralize }}</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-image text-success"></i></div>
+                                <div><strong>{{ module.image_contents.count }}</strong></div>
+                                <small>Image{{ module.image_contents.count|pluralize }}</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-video text-warning"></i></div>
+                                <div><strong>{{ module.video_contents.count }}</strong></div>
+                                <small>Vidéo{{ module.video_contents.count|pluralize }}</small>
+                            </div>
+                        </div>
+                        <div class="mt-3 p-2 bg-warning rounded">
+                            <small><i class="fas fa-info-circle"></i> <strong>Cette action est irréversible.</strong></small>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-danger btn-sm" onclick="deleteModule({{ module.id }})">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelDelete({{ module.id }})">
+                                <i class="fas fa-times"></i> Annuler
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3">
+                        <div class="content-summary">
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-file-text text-primary"></i></div>
+                                <div><strong>{{ module.text_contents.count }}</strong></div>
+                                <small>Texte</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-file-pdf text-danger"></i></div>
+                                <div><strong>{{ module.file_contents.count }}</strong></div>
+                                <small>Fichier</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-image text-success"></i></div>
+                                <div><strong>{{ module.image_contents.count }}</strong></div>
+                                <small>Image</small>
+                            </div>
+                            <div class="content-item">
+                                <div class="content-icon"><i class="fas fa-video text-warning"></i></div>
+                                <div><strong>{{ module.video_contents.count }}</strong></div>
+                                <small>Vidéo</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">Conseils</h5>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h4>Aucun module</h4>
+                    <p class="text-muted">Commencez par créer votre premier module.</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+                        <i class="fas fa-plus"></i> Créer un module
+                    </button>
                 </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="fas fa-info-circle me-2 text-info"></i>
-                            Organisez votre cours en modules logiques
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-info-circle me-2 text-info"></i>
-                            Ajoutez divers types de contenu pour chaque module
-                        </li>
-                        <li>
-                            <i class="fas fa-info-circle me-2 text-info"></i>
-                            L'ordre des modules peut être modifié à tout moment
-                        </li>
-                    </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour ajouter un module -->
+<div class="modal fade" id="addModuleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un nouveau module</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter le module</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de chargement -->
+<div class="modal fade" id="loadingModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Suppression en cours...</span>
+                </div>
+                <p class="mt-2">Suppression en cours...</p>
             </div>
         </div>
     </div>
@@ -123,11 +226,137 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ajouter des classes Bootstrap aux champs du formulaire
-        document.querySelectorAll('form input, form select, form textarea').forEach(function(el) {
-            el.classList.add('form-control');
-        });
+// URL de base générée par Django
+const deleteUrlTemplate = "{% url 'courses:delete_module' course_id=course.id module_id=0 %}";
+
+function confirmDelete(moduleId, moduleTitle) {
+    document.querySelectorAll('.delete-confirmation').forEach(div => {
+        div.style.display = 'none';
     });
+    document.getElementById('confirm-' + moduleId).style.display = 'block';
+}
+
+function cancelDelete(moduleId) {
+    document.getElementById('confirm-' + moduleId).style.display = 'none';
+}
+
+function deleteModule(moduleId) {
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+    
+    document.getElementById('module-' + moduleId).classList.add('loading');
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Remplacer 0 par l'ID réel du module
+    const deleteUrl = deleteUrlTemplate.replace('/0/', `/${moduleId}/`);
+    
+    console.log('Attempting to delete module:', moduleId);
+    console.log('URL:', deleteUrl);
+    console.log('CSRF Token:', csrfToken);
+    
+    // Ajouter un timeout pour forcer la fermeture du modal après 10 secondes
+    const timeoutId = setTimeout(() => {
+        console.log('Request timeout - closing modal');
+        loadingModal.hide();
+        document.getElementById('module-' + moduleId).classList.remove('loading');
+        showAlert('danger', 'La requête a pris trop de temps. Veuillez réessayer.');
+    }, 10000);
+    
+    fetch(deleteUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        // Annuler le timeout car on a reçu une réponse
+        clearTimeout(timeoutId);
+        
+        console.log('Response received:', response.status, response.statusText);
+        console.log('Response headers:', response.headers);
+        
+        // Vérifier le type de contenu
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Vérifier si la réponse est JSON
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            // Si ce n'est pas JSON, lire le texte pour debug
+            return response.text().then(text => {
+                console.log('Non-JSON response:', text);
+                throw new Error('Réponse inattendue du serveur (non-JSON)');
+            });
+        }
+    })
+    .then(data => {
+        console.log('Success data:', data);
+        loadingModal.hide();
+        
+        if (data && data.success) {
+            const moduleElement = document.getElementById('module-' + moduleId);
+            moduleElement.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+            moduleElement.style.opacity = '0';
+            moduleElement.style.transform = 'translateX(-100%)';
+            
+            setTimeout(() => {
+                moduleElement.remove();
+                showAlert('success', data.message || 'Module supprimé avec succès');
+                
+                const remainingModules = document.querySelectorAll('.module-card');
+                if (remainingModules.length === 0) {
+                    location.reload();
+                }
+            }, 500);
+        } else {
+            document.getElementById('module-' + moduleId).classList.remove('loading');
+            showAlert('danger', 'Erreur : ' + (data.error || 'Erreur inconnue'));
+        }
+    })
+    .catch(error => {
+        // Annuler le timeout en cas d'erreur aussi
+        clearTimeout(timeoutId);
+        
+        console.error('Error details:', error);
+        loadingModal.hide();
+        document.getElementById('module-' + moduleId).classList.remove('loading');
+        showAlert('danger', 'Erreur de connexion : ' + error.message);
+    })
+    .finally(() => {
+        // S'assurer que le modal est fermé dans tous les cas
+        setTimeout(() => {
+            if (loadingModal._isShown) {
+                loadingModal.hide();
+            }
+        }, 100);
+    });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
 </script>
 {% endblock %}

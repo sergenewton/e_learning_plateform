@@ -130,7 +130,7 @@
             {% endfor %}
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="{% url 'module_content' course.slug module.id %}" class="btn btn-primary me-md-2">
+                <a href="{% url 'courses:module_content' course.slug module.id %}" class="btn btn-primary me-md-2">
                     Retourner au module
                 </a>
                 {% if not attempt.passed %}

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}E-Learning Platform - Accueil{% endblock %}
 
@@ -22,7 +23,7 @@
                 </div>
             </div>
             <div class="col-lg-6 mt-5 mt-lg-0 text-center">
-                <img src="https://img.freepik.com/free-vector/e-learning-education-template-vector-technology-ad-banner_53876-126253.jpg" alt="E-Learning" class="img-fluid rounded shadow" style="max-height: 400px;">
+                <img src="{% static 'img/educationpic.jpg' %}" alt="E-Learning" class="img-fluid rounded shadow" style="max-height: 400px;">
             </div>
         </div>
     </div>

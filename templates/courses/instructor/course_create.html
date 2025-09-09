@@ -124,7 +124,7 @@
                                 <div class="mb-4">
                                     <label for="{{ form.price.id_for_label }}" class="form-label fw-bold">Prix</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">€</span>
+                                        <span class="input-group-text">BIF</span>
                                         {{ form.price }}
                                     </div>
                                     {% if form.price.errors %}
@@ -149,7 +149,7 @@
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-rocket me-2"></i>Créer le cours
                             </button>
-                            <a href="{% url 'instructor_courses' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'courses:instructor_courses' %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Annuler
                             </a>
                         </div>

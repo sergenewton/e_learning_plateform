@@ -6,9 +6,9 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Mes Cours</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' module.course.slug %}">{{ module.course.title }}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'module_content_list' module.id %}">{{ module.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">{{ module.title }}</a></li>
             <li class="breadcrumb-item active">Ajouter une vidéo</li>
         </ol>
     </nav>
@@ -70,7 +70,7 @@
                         
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Ajouter la vidéo</button>
-                            <a href="{% url 'module_content_list' module.id %}" class="btn btn-outline-secondary">Annuler</a>
+                            <a href="{% url 'courses:module_content_list' module.id %}" class="btn btn-outline-secondary">Annuler</a>
                         </div>
                     </form>
                 </div>

@@ -4,7 +4,7 @@
 {% block title %}{{ course.title }} - Apprentissage - E-Learning Platform{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container py-4">
     <div class="row">
         <!-- Sidebar de navigation -->
         <div class="col-lg-3">
@@ -20,7 +20,7 @@
                             <span>{{ progress_percentage|floatformat:0 }}%</span>
                         </div>
                         <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }}%;" 
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }} %;" 
                                  aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
@@ -28,7 +28,7 @@
                     <!-- Liste des modules -->
                     <div class="list-group list-group-flush">
                         {% for module in modules %}
-                            <a href="{% url 'module_content' course.slug module.id %}" 
+                            <a href="{% url 'courses:module_content' course.slug module.id %}" 
                                class="list-group-item list-group-item-action {% if current_module and current_module.id == module.id %}active{% endif %}">
                                 <div class="d-flex w-100 justify-content-between align-items-center">
                                     <div>
@@ -100,7 +100,7 @@
                         </div>
                         
                         <div class="text-center my-4">
-                            <a href="{% url 'module_content' course.slug current_module.id %}" class="btn btn-primary btn-lg">
+                            <a href="{% url 'courses:module_content' course.slug current_module.id %}" class="btn btn-primary btn-lg">
                                 <i class="fas fa-book-open me-2"></i>Étudier ce module
                             </a>
                         </div>

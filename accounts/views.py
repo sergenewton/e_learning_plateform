@@ -57,9 +57,11 @@ def student_profile(request):
         messages.error(request, "Vous n'avez pas l'autorisation d'accéder à cette page.")
         return redirect('home')
     
-    # Récupérer les cours auxquels l'étudiant est inscrit
-    enrollments = Enrollment.objects.filter(student=request.user).order_by('-enrolled_at')
+    user = request.user
     
+    # Récupérer toutes les inscriptions de l'utilisateur
+    enrollments = Enrollment.objects.filter(student=user).select_related('course')
+     
     # Séparer les inscriptions en cours et complétées
     in_progress_courses = enrollments.filter(completed=False)
     completed_courses = enrollments.filter(completed=True)
@@ -80,6 +82,7 @@ def student_profile(request):
     return render(request, 'accounts/student_profile.html', {
         'form': form,
         'enrollments': enrollments,
+        'enrolled_courses': enrollments,  # Tous les cours inscrits
         'in_progress_courses': in_progress_courses,
         'completed_courses': completed_courses,
         'certificates': certificates

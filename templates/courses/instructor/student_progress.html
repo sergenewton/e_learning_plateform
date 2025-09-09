@@ -6,7 +6,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Mes Cours</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Mes Cours</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_modules' course.slug %}">{{ course.title }}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_students' course.slug %}">Étudiants</a></li>
             <li class="breadcrumb-item active">{{ student.first_name }} {{ student.last_name }}</li>
@@ -133,7 +133,7 @@
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [{{ overall_progress }}, {{ 100|add:"-"|add:overall_progress }}],
+                    data: [{ overall_progress }, { 100|add:"-"|add:overall_progress }],
                     backgroundColor: [
                         '#28a745',
                         '#f0f0f0'

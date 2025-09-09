@@ -6,7 +6,7 @@
 <div class="container my-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'instructor_courses' %}">Tableau de bord</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:instructor_courses' %}">Tableau de bord</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'courses:module_content_list' module.id %}">Module: {{ module.title }}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'quiz_questions' quiz.id %}">Quiz: {{ quiz.title }}</a></li>

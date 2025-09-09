@@ -1,0 +1,7 @@
+{
+    "github.copilot.advanced": {},
+    "workbench.editor.autoLockGroups": {
+        "default": true
+    },
+    "github.copilot.nextEditSuggestions.enabled": true
+}
